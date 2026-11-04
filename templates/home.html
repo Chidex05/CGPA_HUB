@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>CGPA HUB</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='css/all.min.css')}}">
+    
+    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
+</head>
+<body class="background">
+    <div id="nav-bar">
+      <div class="logo">
+         <h2>
+        <i class="fa-solid fa-graduation-cap"></i>CGPA <span>Hub</span></h2>
+         <small>Calculate . Track . Excel</small>
+      </div> 
+      <button class="menu-toggle" id="menu-toggle" aria-label="Open navigation" aria-expanded="false" aria-controls="main-nav">
+         <i class="fa-solid fa-bars"></i>
+      </button>
+      <nav class="main-nav" id="main-nav">
+        <a href="{{ url_for('home') }}"> <i class="fa-solid fa-home"></i>  Home</a>
+
+        <a href="{{ url_for('gpa') }}"><i class="fa-solid fa-calculator"></i>GPA Calculator</a>
+
+        <a href="{{ url_for('cgpa') }}"> <i class="fa-solid fa-chart-column"></i>CGPA Calculator</a>
+         <a href="{{ url_for('dashboard') }}"> <i class="fa-solid fa-chart-column"></i>Dashboard</a>
+         <a href="{{ url_for('dashboard_card') }}"> <i class="fa-solid fa-chart-column"></i>Dashboard_card</a>
+
+
+
+        <a href="{{ url_for('blog') }}"> <i class="fa-solid fa-newspaper"></i>Blog</a>
+       
+      </nav>
+         <i class="fa-solid fa-moon moon"></i>
+         </div>
+      
+       <!-- <div>
+         <i class="fa-solid fa-magnifying-glass search"></i> 
+         <a href="sign-up" id="btn"> Login/Sign-up</a> 
+
+        </div> -->
+   
+
+  <section class="hero">
+    <div class="hero-content">
+        <p class="badge">Your Academic Success Starts Here</p>
+        <h1 class="hero-text">Welcome to <br> CGPA <span>Hub</span> </h1>
+        <p>The all in-one platform for students  to calculate GPA, <br>
+         track CGPA, and access helpful academc resources. <br>
+         Simple. Fast. Reliable. 
+         
+         </p>
+         <div class="hero-buttons">
+            <a href="/gpa-calculator" class="btn-primary">calculate GPA</a>
+            <a href="/cgpa-calculator" class="btn-secondary">calculate CGPA</a> 
+         </div>
+       </div>
+          
+         <div class="hero-image">
+              <img src="/static/Images/books1.png" alt="">
+              
+          
+         <p class="badge2">Better <br>
+            Grades <br>
+             Bigger <br>
+             Dreams</p>
+       </div>
+  </section>
+
+
+
+
+
+  <section class="cards">
+    <div class="calculator">
+        <a href="gpa-calcuator" class="feature-card-link"> 
+          <div class="left-gpa">
+            <div class="icon-box">             
+               <i class="fa-solid fa-calculator "></i>
+            </div>
+            <div class="card-text">
+              
+               <h3> GPA Calculator</h3>
+               <p>Calculate Your Grade Point Average(GPA) for <br>
+                  the current semester with ease</p>
+            </div>
+              <i class="fas fa-arrow-right arrow-right arrow"></i> 
+
+          </div>
+
+        </a>
+
+
+
+        <a href="cgpa-calculator" class="feature-card-link">
+          <div class="right-cgpa">
+             <div class="icon-box">             
+               <i class="fa-solid fa-chart-column"></i>
+             </div>
+             <div class="card-text">
+               <h3>CGPA Calculator</h3>
+               <p>Track your Cumulative Grade Point Average <br>(CGPA)
+                 across multiple semester</p>
+             </div>
+            <i class="fas fa-arrow-right arrow "></i>
+          </div>
+        </a>    
+       </div>
+
+  </section>
+
+  <section class="choose-us">
+      <div class="mission-credentials">
+         <div class="mission">
+            <h2><style></style> WHY CHOOSE CGPA HUB</h2>
+            <h1>More Than Just a Calculator</h1>
+            <p>CGPA Hub is designed to make your academic journey easier, <br>
+               smarter, and more organized. Whether you're in your first semester <br>
+               or your final year, We're here to support you.</p>
+
+      </div>
+      <div class="features">
+           <div class="feature-card">
+              <div class="icon-container">
+                 <i class="fa-solid fa-bolt bolt"></i>
+              </div>
+              <div class="feature-text">
+                 <h3>Fast $ Accurate</h3>
+                 <p>Get reliable results n seconds </p>
+              </div>        
+           </div>
+           <div class="feature-card">
+              <div class="icon-container">
+                 <i class="fa-solid fa-mobile mobile"></i>
+              </div>
+             <div class="feature-text">
+                <h3>Mobile Friendly</h3>
+                <p>Use it anywhere on any device </p>
+             </div>
+              
+            </div>
+
+            <div class="feature-card">
+               <div class="icon-container">
+                  <i class="fa-solid fa-shield shield-halved shield"></i>
+               </div>
+               <div class="feature-text">
+                  <h3>Multiple Institutions</h3>
+                   <p>Supports various Nigerian <br> universities(and more)</p>
+               </div>
+              
+              </div>
+    
+            <div class="feature-card">
+               <div class="icon-container">
+                   <i class="fa-solid fa-book-open book"></i>
+               </div>
+              <div class="feature-text">
+                  <h3>Helpful Resources</h3>
+                 <!-- <p>Blog,tips and guides for academic sucess</p> -->
+              </div>
+              
+            </div>
+        </div>  
+     </div>
+
+  </section>
+
+
+<section class="footer">
+    <div class="stat-item item">
+      <i class="fa fa-solid fa-users"></i>
+      <div class="stat-text">
+         <h3>10K+</h3>
+         <p>Students</p>
+      </div>
+
+    </div>
+
+    <div class="stat-item">
+        <i class="fa-solid fa-landmark"></i> 
+        <div class="stat-text">
+            <h3>20+ </h3>
+            <p>Institutions</p>
+        </div>
+    </div>
+
+     <div class="stat-item">
+         <i class="fa-regular fa-star"></i>
+         <div class="stat-text">  
+            <h3>99% </h3>
+            <p>Accuracy Rate</p>
+         </div>        
+     </div>
+     <div class="stat-message">
+            <h3>Your Goals</h3>
+            <p>Our Priority</p>
+     </div>
+
+
+
+  </section>
+
+    <div id="nav-bar">
+      <div class="logo">
+         <h2>      
+        <i class="fa-solid fa-graduation-cap"></i>CGPA <span>Hub</span></h2>
+         <small>Calculate . Track . Excel</small>
+         <p>Empowering Nigerian students with accurate <br>
+         GPA and CGPA calculation tools, academic <br>
+      resources and planning support</p>
+      
+      <div class="social-icons">
+        <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
+        <a href="#"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+        <a href="#"><i class="fa-brands fa-youtube"></i></a>
+      </div>
+    
+      </div> 
+ 
+      <div class="footer-nav">
+         <div class="calculator-nav">
+            <h2>Calculators</h2>
+            <a href="GPA Calculator.html">GPA Calculator</a>
+            <a href="CGPA Calculator.html">CGPA Calculator</a>
+            <a href="#">Convert to 4.0 scale</a>
+            <a href="#">Grade predictor</a>
+         </div>
+ 
+
+      <div class="resources-nav">
+         <h2>Resources</h2>
+         <a href="#">Academic Blog</a>
+         <a href="#">Study Tips</a>
+         <a href="#">FaQ</a>
+         <a href="#">Contact Us</a>
+
+      </div>
+      <div class="legal-nav">
+         <h2>Legal</h2>
+         <a href="#">Privacy Policy</a>
+          <a href="#">Term of Service</a>
+           <a href="#">Cookies Setting</a>
+      </div>
+
+   </div>
+
+    </div>
+
+
+
+   
+
+    
+
+
+<script src="{{url_for('static', filename='main.js')}}"></script>
+    
+</body>
+</html>

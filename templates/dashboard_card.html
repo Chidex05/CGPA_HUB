@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+    <link rel="stylesheet" href="{{url_for('static', filename='css/all.min.css')}}">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard_card.css') }}">
+
+</head>
+<body class="background">
+    <div id="nav-bar">
+      <div class="logo">
+        <h2><i class="fa-solid fa-graduation-cap"></i>CGPA <span>Hub</span></h2>
+        <small>Calculate . Track . Excel</small>
+      </div>
+      <button
+        class="menu-toggle"id="menu-toggle"
+        aria-label="Open navigation"
+        aria-expanded="false"
+        aria-controls="main-nav"
+      >
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
+      <nav class="main-nav" id="main-nav">
+        <a href="{{ url_for('home') }}">
+          <i class="fa-solid fa-home"></i> Home</a
+        >
+
+        <a href="gpa-calculator"
+          ><i class="fa-solid fa-calculator"></i>GPA Calculator</a
+        >
+
+        <a href="{{ url_for('cgpa') }}">
+          <i class="fa-solid fa-chart-column"></i>CGPA Calculator</a>
+         <a href= "{{ url_for('dashboard') }}"> <i class="fa-solid fa-chart-column"></i>Dashboard</a>
+         
+         <a href="{{ url_for('dashboard_card') }}"> <i class="fa-solid fa-chart-column"></i>Dashboard_card</a>
+
+        <a href="{{ url_for('blog') }}">
+          <i class="fa-solid fa-newspaper"></i>Blog</a
+        >
+      </nav>
+      <i class="fa-solid fa-moon"></i>
+    </div>
+
+    <div class="dashboard-card action-panel">
+  <h3><i class="fa-solid fa-bullseye"></i> Target CGPA Planner</h3>
+  <p class="card-subtitle">Set your graduation target to see what you need next semester.</p>
+  
+  <div class="goal-form">
+    <div class="form-group">
+      <label for="target-cgpa-input">Graduation Target CGPA</label>
+      <input type="number" id="target-cgpa-input" min="1.0" max="5.0" step="0.01" placeholder="e.g. 4.50">
+    </div>
+    
+    <div class="form-group">
+      <label for="next-units-input">Next Semester Units</label>
+      <input type="number" id="next-units-input" min="1" placeholder="e.g. 18">
+    </div>
+    
+    <button type="button" id="calculate-goal-btn" class="dash-action-btn">
+      <i class="fa-solid fa-calculator"></i> Calculate Required GPA
+    </button>
+  </div>
+
+  <!-- Dynamic Target Result Box (Hidden by default, shows up when calculated) -->
+  <div id="goal-result-box" class="goal-result-box" style="display: none; margin-top: 15px; padding: 15px; border-radius: 8px; background: rgba(139, 77, 255, 0.1); border: 1px dashed #8b4dff; text-align: center;">
+    <p style="margin: 0; color: #cbd0f5; font-size: 13px;">Required GPA Next Semester:</p>
+    <h3 id="required-gpa-display" style="margin: 5px 0 0 0; color: #ffffff; font-size: 24px;">0.00</h3>
+    <p id="goal-feedback-msg" style="margin: 5px 0 0 0; color: #858dbd; font-size: 12px;"></p>
+  </div>
+</div>
+
+
+
+    <script src="{{ url_for('static', filename='dashboardbtn.js') }}"></script>
+    
+</body>
+</html>

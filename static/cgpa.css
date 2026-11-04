@@ -1,0 +1,491 @@
+*{
+    margin: 0%;
+    padding: 0%;
+    box-sizing: border-box;
+}
+.background{
+    font-family: sans-serif;
+}
+.gpa-hero,.gpa-heading{
+    display: flex;
+    justify-content: space-around;
+    gap: 30px;
+    margin: 1em;
+
+}
+.hero-text{
+    font-size: 16px;
+}
+.hero-text p{
+     position: relative;
+
+}
+.hero-text p::after{
+    content: " ";
+    display: block;
+    width: 70px;
+    height: 3px;
+    background: #7C3AED;
+    border-radius: 5px;
+}
+.gpa-image{
+    display: flex;
+    justify-content: center;
+    position: relative;
+    align-items: center;
+}
+.gpa-image::before{
+    content: " ";
+    position: absolute;
+    width: 80%;
+    min-height: 80%;
+    background: radial-gradient(ellipse,
+    rgba(115,45,255,0.35)
+    0%,
+    rgba(75,25,180,0.18)
+    40%,
+    transparent 75%
+    );
+    filter: blur(40px);
+    z-index: 0;
+}
+.gpa-image img{
+    width: 100%;
+    height: 200px;
+    object-fit: contain;
+    z-index: 1;
+}
+
+
+.icon-box{
+    font-size: 35px;
+    width: 53px;
+    height: 53px;
+    border-radius: 20px;
+    background: linear-gradient(
+        90deg, 
+        #C084FC,
+        #7C3AED
+    );
+    z-index: 1;
+}
+
+
+.main-cgpa{
+    display: grid;
+        grid-template-columns: 2fr 1fr;
+      align-items: start;
+      width: 90%;
+      margin: auto;
+    
+}
+.cgpa-hero{
+    
+    border: 1px solid #373d83;
+    height: 30vh;
+    border-radius: 10px;
+    line-height: 30px;
+
+}
+.cgpa-hero p{
+    font-size: 13px;
+}
+.form-group #choose-semester{
+    width: 50%;
+    padding:  15px 30px;
+    background: #121a40;
+    color:white;
+    border: 1px solid #373d83;
+    border-radius: 7px;
+    outline: none;
+
+}
+
+
+
+
+
+.summary-card{
+     border: 3px solid  #343778;
+    height: 90vh;
+    border-radius: 10px;
+    
+}
+.summary-item{
+    gap: 10px;
+    padding: 28px 0;
+    border-bottom: 1px solid #292f63;
+    color: #c4c9ed;
+}
+.summary-item strong{
+    color: white;
+}
+.result-box{
+
+      text-align: center; 
+      font-size: 20px;
+}
+.result-box h3{
+    font-size: 20px;
+    color: white;
+
+}
+.result-box p{
+    color: white;
+    font-weight: 600;
+}
+.summary-card .small-text{
+    font-weight: bold;
+    text-align: center;
+         background: #1c245b;
+      border: 1px solid  #343778;;
+      border-radius: 10px;
+       width: 100%;
+       height: 80px;
+        margin:20px auto;
+      text-align: center;
+}
+
+.card{
+        border: 1px solid #343778;
+        padding: 30px;
+        border-radius: 7px;
+   
+}
+.course-heading{
+    gap: 10px;
+}
+.form-row{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 5px;
+    align-items: end;
+}
+.form-group{
+     display: flex;
+     flex-direction: column;
+     gap: 15px;
+}
+
+.form-group label{
+    font-size: 14px;
+    color: #cbd0f5;
+}
+.form-group input,
+.form-group select{
+    width: 70%;
+    padding:  15px 30px;
+    background: #121a40;
+    color: white;
+    border: 1px solid #373d83;
+    border-radius: 7px;
+    outline: none;
+}
+.form-group input:focus,
+.form-group select:focus{
+    border-color: #9955ff;
+}
+.form-group input::placeholder{
+   color:  #858dbd;
+}
+.btn{
+    padding: 15px 50px;
+    background: linear-gradient(
+        120deg,
+        #8b4dff,
+        #5b32e5
+    );
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.btn:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px;
+}
+
+
+.table-wrap{
+
+    border: 1px solid  #343778;
+    border-radius: 8px;
+}
+
+
+
+table{
+    border-collapse: collapse;
+  
+}
+thead{
+    background: #1c245b;
+}
+th,td{
+    padding: 10px 50px;
+    text-align: center;
+    border-bottom: 1px solid #292f63;
+    border: none;
+}
+th{
+    font-size: 14px;
+}
+
+.empty-state{
+    color: #aeb7e9;
+}
+.btn-calculator{
+    font-size: 20px;
+}
+.btn{
+    display: block;
+    margin: 10px auto 0;
+}
+
+
+
+
+    
+
+.quote{
+    margin-top: 15em;
+    text-align: center;
+     border: 1px solid #373080;
+     border-top: 2px solid #29295f;
+     font-size: 13px;    
+}
+
+  @media screen and (max-width: 1024px) {
+
+
+
+
+
+  .form-group input,
+  .form-group select {
+    width: 90% !important;
+    padding: 12px 20px !important;
+  }
+
+  .form-group #choose-semester {
+    width: 75% !important;
+  }
+
+  .summary-card {
+    height: auto !important;
+    padding: 20px !important;
+  }
+
+  .table-wrap {
+    bottom: 0 !important;
+  }
+
+  th, td {
+    padding: 10px 25px !important;
+  }
+}  
+
+
+@media screen and (max-width: 768px) {
+  br {
+    display: none;
+  }
+
+  body, html {
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+
+  #nav-bar {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5em 5%;
+    width: 95%;
+  }
+
+  .menu-toggle {
+    display: block !important; 
+    color: white;
+    padding: 8px 14px;
+    border-radius: 6px;
+    order: 2;
+  }
+
+  .fa-moon {
+    order: 3; 
+  }
+
+  #nav-bar .main-nav {
+    display: none; 
+    flex-direction: column;
+    width: 100%;
+    order: 4; 
+    margin-top: 15px;
+    gap: 8px;
+  }
+
+  #nav-bar .main-nav.active {
+    display: flex !important;
+  }
+
+  #nav-bar .main-nav a {
+    display: block;
+    padding: 14px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    width: 100%;
+  }
+
+
+  .main-cgpa {
+    grid-template-columns: 1fr; 
+    width: 95%;
+    gap: 30px;
+  }
+
+  .cgpa-hero {
+    height: auto; 
+    padding: 20px;
+  }
+  .form-group #choose-semester,
+  .form-group input,
+  .form-group select {
+    width: 100% !important; 
+    padding: 12px 20px;
+    font-size: 16px; 
+  }
+  .form-row {
+    grid-template-columns: 1fr; 
+    gap: 15px;
+  }
+  .btn {
+    width: 100%; 
+    padding: 15px 0;
+  }
+
+  .summary-card {
+    height: auto; 
+    padding: 20px;
+  }
+  .summary-card .small-text {
+    width: 90%;
+    height: auto;
+    padding: 10px;
+  }
+  .table-wrap {
+    width: 100%;
+    overflow-x: auto; 
+    margin-top: 20px;
+  }
+  table {
+    width: 100%;
+    min-width: 600px; 
+  }
+  th, td {
+    padding: 12px 20px; 
+  }
+}
+
+ 
+@media screen and (max-width: 480px) {
+  * {
+    box-sizing: border-box !important;
+  }
+
+  body, html {
+    width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+
+  .main-cgpa {
+    width: 95% !important; 
+    margin: 15px auto !important;
+    gap: 20px !important;
+    display: flex !important;
+    flex-direction: column !important; 
+  }
+
+  .control-div {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 20px !important;
+  }
+
+  
+  .card, 
+  .summary-card, 
+  .table-wrap, 
+  .cgpa-hero {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 15px !important;
+    border-radius: 8px !important;
+    height: auto !important; 
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group #choose-semester {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 12px 15px !important;
+    font-size: 15px !important;
+  }
+
+
+  .btn {
+    width: 100% !important;
+    margin: 10px 0 0 0 !important;
+    padding: 14px 0 !important;
+  }
+
+  .summary-card .small-text {
+    width: 100% !important;
+    font-size: 12px !important;
+    height: auto !important;
+    padding: 10px !important;
+    margin: 15px auto 0 !important;
+  }
+
+  .table-wrap {
+    width: 100%;
+    overflow-x: auto !important; 
+    -webkit-overflow-scrolling: touch;
+  }
+
+  table {
+    width: 100% !important;
+    min-width: 430px !important;
+  }
+  thead{
+    /* background:green; */
+    width: 10%;
+}
+
+  th, td {
+    padding: 10px 12px !important;
+    font-size: 13px !important;
+  }
+ 
+} 
+
+
+
+
+
+
+
+
+
+
+
+    
+
+

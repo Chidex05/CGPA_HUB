@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Dashboard</title>
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+    <link rel="stylesheet" href="{{url_for('static', filename='css/all.min.css')}}">
+
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+</head>
+
+<body class="background">
+      <div id="nav-bar">
+      <div class="logo">
+         <h2>
+        <i class="fa-solid fa-graduation-cap"></i>CGPA <span>Hub</span></h2>
+         <small>Calculate . Track . Excel</small>
+      </div> 
+      <button class="menu-toggle" id="menu-toggle" aria-label="Open navigation" aria-expanded="false" aria-controls="main-nav">
+         <i class="fa-solid fa-bars"></i>
+      </button>
+      <nav class="main-nav" id="main-nav">
+        <a href="{{ url_for('home') }}"> <i class="fa-solid fa-home"></i>  Home</a>
+
+        <a href="{{ url_for('gpa') }}"><i class="fa-solid fa-calculator"></i>GPA Calculator</a>
+
+        <a href="{{ url_for('cgpa') }}"> <i class="fa-solid fa-chart-column"></i>CGPA Calculator</a>
+         <a href="{{ url_for('dashboard') }}"> <i class="fa-solid fa-chart-column"></i>Dashboard</a>
+         <a href="{{ url_for('dashboard_card') }}"> <i class="fa-solid fa-chart-column"></i>Dashboard_card</a>
+
+
+
+        <a href="{{ url_for('blog') }}"> <i class="fa-solid fa-newspaper"></i>Blog</a>
+       
+      </nav>
+         <i class="fa-solid fa-moon moon"></i>
+         </div>
+
+
+
+  <main class="dashboard-container">
+  
+  <!-- ROW 1: TOP SUMMARY STATS GRID -->
+  <section class="stat-cards-grid">
+    
+    <div class="stat-card border-purple">
+      <div class="stat-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+      <div class="stat-info">
+        <span>Current CGPA</span>
+        <h2 id="dash-cgpa">0.00</h2>
+      </div>
+    </div>
+
+    <div class="stat-card border-blue">
+      <div class="stat-icon"><i class="fa-solid fa-book-bookmark"></i></div>
+      <div class="stat-info">
+        <span>Total Units Passed</span>
+        <h2 id="dash-units">0</h2>
+      </div>
+    </div>
+
+    <div class="stat-card border-green">
+      <div class="stat-icon"><i class="fa-solid fa-award"></i></div>
+      <div class="stat-info">
+        <span>Academic Standing</span>
+        <h2 id="dash-standing">First Class</h2>
+      </div>
+    </div>
+
+    <div class="stat-card border-orange">
+      <div class="stat-icon"><i class="fa-solid fa-bullseye"></i></div>
+      <div class="stat-info">
+        <span>Target GPA Goal</span>
+        <h2>4.50</h2>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ROW 2: DETAILED ANALYTICS GRID -->
+  <section class="dashboard-details">
+    
+    <!-- LEFT SIDE: SEMESTER TRACKING CARDS -->
+    <div class="analytics-main">
+      <div class="dashboard-card">
+        <h3><i class="fa-solid fa-chart-line"></i> Semester Performance Overview</h3>
+        <p class="card-subtitle">Track your GPA changes across different semesters</p>
+        
+        <!-- Placeholder for graph visualization later -->
+        <div class="chart-placeholder">
+          <div class="bar" style="height: 80%;"><span>Sem 1<br>4.00</span></div>
+          <div class="bar" style="height: 92%;"><span>Sem 2<br>4.60</span></div>
+          <div class="bar" style="height: 70%;"><span>Sem 3<br>3.50</span></div>
+          <div class="bar empty"><span>Sem 4<br>--</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT SIDE: QUICK ACTIONS & ALERTS -->
+    <div class="analytics-sidebar">
+      <div class="dashboard-card action-panel">
+        <h3>Quick Actions</h3>
+        <a href="gpa-calculator" class="dash-action-btn"><i class="fa-solid fa-plus"></i> Calculate New GPA</a>
+        <a href="{{ url_for('dashboard_card') }}" class="dash-action-btn alt-btn"><i class="fa-solid fa-gear"></i> Update Profile Goal</a>
+      </div>
+
+      <div class="dashboard-card alert-panel">
+        <h3>Academic Insights</h3>
+        <p id="dash-insight-msg"><i class="fa-solid fa-lightbulb text-yellow"></i> Great job! You need to maintain a 4.20 GPA next semester to protect your First Class standing.</p>
+      </div>
+    </div>
+
+  </section>
+</main>
+
+    
+
+ 
+<script src="{{url_for('static', filename='dashboard.js')}}"></script>
+    
+   
+<!-- <script src="{{url_for('static', filename='main.js')}}"></script> -->
+
+</body>
+</html>

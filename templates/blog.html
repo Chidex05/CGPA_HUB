@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+   rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <title>CGPA HUB</title>
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='css/all.min.css')}}"
+    />
+
+    <link rel="stylesheet" href="{{url_for('static', filename='blog.css')}}" />
+  </head>
+  <body class="background">
+    <div id="nav-bar">
+      <div class="logo">
+        <h2><i class="fa-solid fa-graduation-cap"></i>CGPA <span>Hub</span></h2>
+        <small>Calculate . Track . Excel</small>
+      </div>
+      <button
+        class="menu-toggle"id="menu-toggle"
+        aria-label="Open navigation"
+        aria-expanded="false"
+        aria-controls="main-nav"
+      >
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
+      <nav class="main-nav" id="main-nav">
+        <a href="{{ url_for('home') }}">
+          <i class="fa-solid fa-home"></i> Home</a
+        >
+
+        <a href="gpa-calculator"
+          ><i class="fa-solid fa-calculator"></i>GPA Calculator</a
+        >
+
+        <a href="{{ url_for('cgpa') }}">
+          <i class="fa-solid fa-chart-column"></i>CGPA Calculator</a>
+         <a href="{{ url_for('dashboard') }}"> <i class="fa-solid fa-chart-column"></i>Dashboard</a>
+          <a href="{{ url_for('dashboard_card') }}"> <i class="fa-solid fa-chart-column"></i>Dashboard_card</a>
+
+        <a href="{{ url_for('blog') }}">
+          <i class="fa-solid fa-newspaper"></i>Blog</a
+        >
+      </nav>
+      <i class="fa-solid fa-moon"></i>
+    </div>
+
+    <section>
+      <div class="gpa-hero">
+        <div class="gpa-heading">
+          <div class="hero-text">
+            <span class="span">Our blog</span>
+            <h1>CGPA Hub <span>Blog</span></h1>
+            <p>Insights, tips, and gudes to help you excel academically.</p>
+            <i class="fa-solid fa-search search"></i>
+            <input type="text" id="search-bar" placeholder="Search articles" />
+          </div>
+        </div>
+        <div class="gpa-image">
+          <img src="/static/Images/books2.png" alt="" />
+        </div>
+      </div>
+    </section>
+
+    <div class="blog-page">
+      <div class="blog-hero">
+        <h4>Featured Articles</h4>
+        <h1>How to Calculate Your CGPA <br />in Nigerian Universites</h1>
+        <p>
+          A simple step-by-step guide to understanding how CGPA is <br />
+          calculated,the grading system used in Nigerian Universites <br />
+          and what you need to know to get right.
+        </p>
+        <div class="article-meta">
+          <span><i class="fa-regular fa-calendar"></i> 0ct 28,2026</span>
+          <span><i class="fa-regular fa-clock"></i> 6 min read</span>
+        </div>
+        <div class="articles">
+          <a href="">Read Article <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <div class="blog-image">
+        <img src="/static/Images/blog1.jpg" alt="" />
+      </div>
+    </div>
+    <div class="heading">
+      <h1><i class="fa-regular fa-calendar"></i>Latest Articles</h1>
+    </div>
+
+    <div class="all-article">
+      <div class="first-article">
+        <div class="article-image">
+          <img
+            src="static/Images/522099927e2af7a76ab1ca67a52b3ccd.jpg"
+            alt=""
+          />
+        </div>
+        <div class="article-words">
+          <p class="letters">GPA Grade</p>
+          <h2>How to Calculate Your GPA</h2>
+          <p>
+            Learn how to calculate your GPA step by step, <br />
+            including the grading system and unit weighting <br />
+            method
+          </p>
+          
+
+          <div class="article-meta">
+            <span><i class="fa-regular fa-calendar"></i> 0ct 28,2026</span>
+            <span><i class="fa-regular fa-clock"></i> 4 min read</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="first-article">
+        <div class="article-image">
+          <img
+            src="static/Images/5e613082b1f41a852a07ad23017508af.jpg"
+            alt=""
+          />
+        </div>
+        <div class="article-words">
+          <p class="letters">Academic Grade</p>
+          <h2>Understanding CGPA</h2>
+          <p>
+            What CGPA means, how it's diifferent from GPA, <br />
+            and why it matters for your academic future
+          </p>
+
+          <div class="article-meta">
+            <span><i class="fa-regular fa-calendar"></i> 0ct 28,2026</span>
+            <span><i class="fa-regular fa-clock"></i> 4 min read</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="first-article">
+        <div class="article-image">
+          <img
+            src="static/Images/6e92d5436836fc828a79e51f2e63ccf7.jpg"
+            alt=""
+          />
+        </div>
+        <div class="article-words">
+          <p class="letters">Study Tips</p>
+          <h2>How to Improve Your GPA</h2>
+          <p>
+            Practical tips and proven strategies to boost <br />
+            your GPA and stay consistent in your studies
+          </p>
+
+          <div class="article-meta">
+            <span><i class="fa-regular fa-calendar"></i> 0ct 28,2026</span>
+            <span><i class="fa-regular fa-clock"></i> 4 min read</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="first-article">
+        <div class="article-image">
+          <img
+            src="static/Images/ce469c725d7ecb03f059d7569411f664.jpg"
+            alt=""
+          />
+        </div>
+        <div class="article-words">
+          <p class="letters">Grading System</p>
+          <h2>
+            Understanding the 5-points <br />
+            Grading system
+          </h2>
+          <p>
+            A clear breakdown of the 5-points grading system <br />
+            used in most Nigerian Universites
+          </p>
+
+          <div class="article-meta">
+            <span><i class="fa-regular fa-calendar"></i> 0ct 28,2026</span>
+            <span><i class="fa-regular fa-clock"></i> 4 min read</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="first-article">
+        <div class="article-image">
+          <img
+            src="static/Images/5b9cc83932aee09221b56e8e01dcb86d.jpg"
+            alt=""
+          />
+        </div>
+        <div class="article-words">
+          <p class="letters">GPA Guide</p>
+          <h2>How to Calculate Carryover Courses</h2>
+          <p>
+            Learn how Carryover Courses affects your GPA <br />
+            and how to include them in your Calculation method
+          </p>
+
+          <div class="article-meta">
+            <span><i class="fa-regular fa-calendar"></i> 0ct 28,2026</span>
+            <span><i class="fa-regular fa-clock"></i> 4 min read</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="first-article">
+        <div class="article-image">
+          <img
+            src="static/Images/2968ee4c7b4b57b263f385efb0f74fa0.jpg"
+            alt=""
+          />
+        </div>
+        <div class="article-words">
+          <p class="letters">Study Tips</p>
+          <h2>
+            7 Study Habits That Improve <br />
+            Academic Peformance
+          </h2>
+          <p>
+            Simple habts that can make a big difference <br />
+            in your result
+          </p>
+
+          <div class="article-meta">
+            <span><i class="fa-regular fa-calendar"></i> 0ct 28,2026</span>
+            <span><i class="fa-regular fa-clock"></i> 4 min read</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="{{url_for('static', filename='main.js')}}"></script>
+  </body>
+</html>

@@ -1,0 +1,330 @@
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.menu-toggle{
+    display: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 22px;
+    border: 1px solid rgba(192, 132, 252, 0.4);
+
+}
+.background{
+    background: linear-gradient(
+        135deg,
+        #070617 0%,
+        #10082B 50%,
+        #1A0638 100%
+    );
+    color: #FFFFFF;
+}
+#nav-bar{
+    display: flex;
+    justify-content: space-around;
+    font-family: sans-serif;
+    font-weight: 600;
+    border-bottom: 2px solid #3e0c89 ;
+    padding: 2em 0;
+
+}
+.logo span{
+    background: linear-gradient(
+        90deg, 
+        #C084FC,
+        #7C3AED
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+.nav-bar .search i{
+    font-size: 24px;
+    
+}
+#nav-bar .main-nav a{
+    text-decoration: none;
+    color: white;
+    padding: 30px;
+    
+}
+#nav-bar .main-nav a:hover{
+     background: linear-gradient(
+        90deg, 
+        #C084FC,
+        #7C3AED
+
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    border-bottom: 2px solid   #7C3AED ;
+}
+
+.main-nav a::after{
+content: '';
+position: absolute;
+width: 0;
+height: 2px;
+bottom: 0;
+left: 0;
+background-color: yellow;
+transition: width 0.3s ease-in-out;
+}
+.main-nav a:hover::after{
+    width: 100%;
+}
+
+/* FIXED: This gives your dashboard chart bars an initial height alignment structure */
+.chart-placeholder .bar[style] {
+  height: var(--bar-height, 10%) !important;
+}
+
+
+.dashboard-container {
+  width: 90%;
+  max-width: 1400px;
+  margin: 40px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  box-sizing: border-box;
+}
+
+/* --- Row 1: Summary Metric Cards --- */
+.stat-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  width: 100%;
+}
+
+.stat-card {
+  background: #121a40;
+  border: 1px solid #343778;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Accent Borders */
+.stat-card.border-purple { border-left: 5px solid #9955ff; }
+.stat-card.border-blue { border-left: 5px solid #3b82f6; }
+.stat-card.border-green { border-left: 5px solid #10b981; }
+.stat-card.border-orange { border-left: 5px solid #f97316; }
+
+.stat-icon {
+  font-size: 28px;
+  color: #cbd0f5;
+  background: rgba(52, 55, 120, 0.4);
+  width: 55px;
+  height: 55px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-info span {
+  font-size: 13px;
+  color: #858dbd;
+  font-weight: 500;
+}
+
+.stat-info h2 {
+  margin: 5px 0 0 0;
+  font-size: 24px;
+  color: #ffffff;
+}
+
+/* --- Row 2: Analytics Split Section --- */
+.dashboard-details {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 30px;
+  align-items: start;
+}
+
+.dashboard-card {
+  background: #121a40;
+  border: 1px solid #343778;
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.dashboard-card h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.card-subtitle {
+  font-size: 13px;
+  color: #858dbd;
+  margin: 5px 0 20px 0;
+}
+
+/* Mini Bar Chart Graphic Visualizer */
+.chart-placeholder {
+  height: 200px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  background: rgba(18, 26, 64, 0.5);
+  border-radius: 8px;
+  padding: 20px;
+  border: 1px dashed #343778;
+}
+
+.chart-placeholder .bar {
+  width: 50px;
+  background: linear-gradient(to top, #5b32e5, #8b4dff);
+  border-radius: 6px 6px 0 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  position: relative;
+  transition: 0.3s ease;
+}
+
+.chart-placeholder .bar:hover {
+  transform: scaleY(1.05);
+}
+
+.chart-placeholder .bar span {
+  position: absolute;
+  bottom: -35px;
+  font-size: 11px;
+  color: #cbd0f5;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.chart-placeholder .bar.empty {
+  height: 5% !important;
+  background: #292f63;
+}
+
+/* Sidebar Elements Styling */
+.analytics-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.dash-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px;
+  margin-top: 15px;
+  background: linear-gradient(120deg, #8b4dff, #5b32e5);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  text-decoration: none;
+  text-align: center;
+  transition: 0.2s ease;
+}
+
+.dash-action-btn.alt-btn {
+  background: transparent;
+  border: 1px solid #343778;
+  color: #cbd0f5;
+}
+
+.dash-action-btn:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+
+.alert-panel p {
+  font-size: 14px;
+  color: #c4c9ed;
+  line-height: 1.5;
+}
+
+.text-yellow { color: #facc15; }
+
+/* ==========================================================================
+   3. RESPONSIVE RESPONSIVENESS MEDIA BREAKS
+   ========================================================================== */
+@media screen and (max-width: 768px) {
+  .dashboard-details {
+      br {
+    display: none;
+  }
+  body, html {
+    overflow-x: hidden;
+  }
+
+    #nav-bar{
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+
+  }
+  
+  .menu-toggle {
+    display: block !important; /* Reveals the hamburger toggle button */
+    color: white;
+    padding: 8px 14px;
+    border-radius: 6px;
+    order: 2; /* Positions button nicely alongside the logo and moon */
+  }
+
+  .fa-moon {
+    order: 3; /* Keeps moon icon positioned on the far end */
+  }
+  
+  #nav-bar .main-nav {
+    display: none; /* Safely hides standard horizontal row links */
+    flex-direction: column;
+    width: 100%;
+    order: 4; /* Pushes the menu list box below the core row elements */
+    margin-top: 15px;
+    gap: 8px;
+  }
+
+  /* Class injected dynamically by JavaScript when clicked */
+  #nav-bar .main-nav.active {
+    display: flex !important;
+  }
+
+  #nav-bar .main-nav a {
+    display: block;
+    padding: 14px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    width: 80%;
+    margin: auto;
+  }
+    grid-template-columns: 1fr; /* Stack graphics and columns into single lane */
+    gap: 20px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .dashboard-container {
+    width: 100%;
+    padding: 15px;
+  }
+  .stat-card {
+    padding: 15px;
+  }
+  .chart-placeholder .bar {
+    width: 35px;
+  }
+}
