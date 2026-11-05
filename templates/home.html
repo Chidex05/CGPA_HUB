@@ -26,7 +26,7 @@
 
         <a href="{{ url_for('cgpa') }}"> <i class="fa-solid fa-chart-column"></i>CGPA Calculator</a>
          <a href="{{ url_for('dashboard') }}"> <i class="fa-solid fa-chart-column"></i>Dashboard</a>
-         <a href="{{ url_for('dashboard_card') }}"> <i class="fa-solid fa-chart-column"></i>Dashboard_card</a>
+         <a href="{{ url_for('grade_predictor') }}"> <i class="fa-solid fa-chart-column"></i>Grade Predictor</a>
 
 
 
@@ -128,7 +128,7 @@
               </div>
               <div class="feature-text">
                  <h3>Fast $ Accurate</h3>
-                 <p>Get reliable results n seconds </p>
+                 <p>Get reliable results in seconds </p>
               </div>        
            </div>
            <div class="feature-card">
@@ -199,9 +199,97 @@
             <p>Our Priority</p>
      </div>
 
-
-
   </section>
+
+
+
+  <section class="contact-section">
+
+    <div class="contact-heading">
+        <i class="fa-solid fa-envelope"></i>
+
+        <h2>Contact <span>Us</span></h2>
+
+        <p>We'd love to hear from you. Reach out to us anytime!</p>
+    </div>
+
+    <div class="contact-container">
+
+        <!-- Developer Contact -->
+        <div class="contact-card">
+
+            <div class="contact-card-heading">
+                <div class="contact-icon">
+                    <i class="fa-solid fa-code"></i>
+                </div>
+
+                <div>
+                    <h3>Contact the Developer</h3>
+                    <p>Have a question, suggestion or just want to say hi?</p>
+                </div>
+            </div>
+
+            <div class="contact-links">
+
+                <a href="https://wa.me/2348081646171"
+                   target="_blank" rel="noopener noreferrer">
+                    <i class="fa-brands fa-whatsapp"></i>
+                    <span>Chat on WhatsApp</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </a>
+
+                <a href="mailto:peculiarudeh8@gmail.com">
+                    <i class="fa-solid fa-envelope"></i>
+                    <span>Send an Email</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </a>
+
+                <a href="https://t.me/CGPA_HUB"
+                   target="_blank" rel="noopener noreferrer">
+                    <i class="fa-brands fa-telegram"></i>
+                    <span>Join us on Telegram</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </a>
+
+            </div>
+        </div>
+
+
+        <!-- CGPA Hub Support -->
+        <div class="contact-card">
+
+            <div class="contact-card-heading">
+                <div class="contact-icon">
+                    <i class="fa-solid fa-headset"></i>
+                </div>
+
+                <div>
+                    <h3>CGPA Hub Support</h3>
+                    <p>Need help with GPA/CGPA or have an issue? We're here to assist you.</p>
+                </div>
+            </div>
+
+            <div class="contact-links">
+
+                <a href="mailto:chidirimugc@gmail.com">
+                    <i class="fa-solid fa-envelope"></i>
+                    <span>Email Support</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </a>
+
+                <a href="https://wa.me/2348081646171"
+                   target="_blank" rel="noopener noreferrer">
+                    <i class="fa-brands fa-whatsapp"></i>
+                    <span>Chat with Support</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </a>
+
+            </div>
+        </div>
+
+    </div>
+
+</section>
 
     <div id="nav-bar">
       <div class="logo">
@@ -211,39 +299,23 @@
          <p>Empowering Nigerian students with accurate <br>
          GPA and CGPA calculation tools, academic <br>
       resources and planning support</p>
-      
-      <div class="social-icons">
-        <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
-        <a href="#"><i class="fa-brands fa-instagram"></i></a>
-        <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
-        <a href="#"><i class="fa-brands fa-youtube"></i></a>
-      </div>
+
     
       </div> 
  
       <div class="footer-nav">
          <div class="calculator-nav">
             <h2>Calculators</h2>
-            <a href="GPA Calculator.html">GPA Calculator</a>
-            <a href="CGPA Calculator.html">CGPA Calculator</a>
-            <a href="#">Convert to 4.0 scale</a>
-            <a href="#">Grade predictor</a>
+            <a href="gpa-calculator">GPA Calculator</a>
+            <a href="{{url_for('cgpa')}}">CGPA Calculator</a>
+            <a href="{{ url_for('dashboard') }}">Grade predictor</a>
          </div>
  
 
       <div class="resources-nav">
          <h2>Resources</h2>
          <a href="#">Academic Blog</a>
-         <a href="#">Study Tips</a>
          <a href="#">FaQ</a>
-         <a href="#">Contact Us</a>
-
-      </div>
-      <div class="legal-nav">
-         <h2>Legal</h2>
-         <a href="#">Privacy Policy</a>
-          <a href="#">Term of Service</a>
-           <a href="#">Cookies Setting</a>
       </div>
 
    </div>

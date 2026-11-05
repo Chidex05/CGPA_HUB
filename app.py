@@ -24,9 +24,9 @@ def gpa():
 def dashboard():
     return render_template('dashboard.html')
 
-@app.route('/dashboard_card')
-def dashboard_card():
-    return render_template('dashboard_card.html')
+@app.route('/grade_predictor')
+def grade_predictor():
+    return render_template('grade_predictor.html')
 
 
 

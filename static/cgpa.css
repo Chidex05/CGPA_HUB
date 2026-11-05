@@ -257,36 +257,126 @@ th{
      font-size: 13px;    
 }
 
-  @media screen and (max-width: 1024px) {
 
 
 
 
+@media screen and (max-width: 1024px) {
 
-  .form-group input,
+  #nav-bar {
+    display: flex;
+    justify-content: space-around;
+    width: 95%;
+    margin: auto;
+  }
+  
+  .menu-toggle {
+    display: block !important; 
+    color: white;
+    padding: 8px 14px;
+    border-radius: 6px;
+    order: 2; 
+  }
+
+  .fa-moon {
+    order: 3; 
+  }
+  
+  #nav-bar .main-nav {
+    display: none; 
+    flex-direction: column;
+    width: 100%;
+    order: 4; 
+    margin-top: 15px;
+    gap: 8px;
+  }
+
+  #nav-bar .main-nav.active {
+    display: flex !important;
+  }
+
+  #nav-bar .main-nav a {
+    display: block;
+    padding: 14px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    width: 80%;
+    margin: auto;
+  }
+.main-cgpa {
+    display: grid ;
+    grid-template-columns:minmax(0, 1fr) minmax(0, 1fr) ; 
+    width: 95% ;
+    margin: 20px auto ;
+    align-items: start ;
+  }
+
+  .control-div {
+    display: contents !important; 
+  }
+
+
+  .cgpa-hero {
+    grid-column: 1 ;
+    grid-row: 1;
+    width: 100% !important;
+  
+    height: auto !important; 
+  }
+
+  .card {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    height: auto ; 
+  } 
+ 
+  .form-row {
+    display: flex !important;
+    flex-direction: column !important; 
+    align-items: flex-start !important; 
+    gap: 15px !important;
+    padding: 20px 20px 20px 30px !important;
+    width: 100% !important; 
+    box-sizing: border-box !important;
+  } 
+ 
+  .form-group {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }  
+
+    .form-group input,
   .form-group select {
-    width: 90% !important;
+    display: block !important;
+    width: 100% !important; 
     padding: 12px 20px !important;
-  }
+    box-sizing: border-box !important;
+  } 
 
-  .form-group #choose-semester {
-    width: 75% !important;
-  }
+   .btn {
+    width: auto !important;
 
-  .summary-card {
-    height: auto !important;
-    padding: 20px !important;
-  }
+    margin: auto ; 
+    box-sizing: border-box !important;
+  } 
 
-  .table-wrap {
-    bottom: 0 !important;
-  }
+   table {
+    width: 100% !important;
+  } 
 
   th, td {
-    padding: 10px 25px !important;
+    padding: 5px!important;
   }
-}  
-
+  .btn{
+    text-align: center;
+  } 
+}
+   
 
 @media screen and (max-width: 768px) {
   br {
@@ -305,7 +395,7 @@ th{
     justify-content: space-between;
     align-items: center;
     padding: 1.5em 5%;
-    width: 95%;
+    width: 90%;
   }
 
   .menu-toggle {
@@ -365,7 +455,7 @@ th{
   }
   .btn {
     width: 100%; 
-    padding: 15px 0;
+    padding: 15px 25px;
   }
 
   .summary-card {
@@ -400,6 +490,14 @@ th{
   body, html {
     width: 100% !important;
     overflow-x: hidden !important;
+  }
+    #nav-bar {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5em 5%;
+    width: 100%;
   }
 
 
@@ -456,13 +554,13 @@ th{
 
   .table-wrap {
     width: 100%;
-    overflow-x: auto !important; 
+    overflow-x: hidden !important; 
     -webkit-overflow-scrolling: touch;
   }
 
   table {
     width: 100% !important;
-    min-width: 430px !important;
+    min-width: 0;
   }
   thead{
     /* background:green; */

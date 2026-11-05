@@ -1,0 +1,6 @@
+venv/
+.venv/
+--pycache__/
+*.pyc
+.env
+templates - Shortcut.lnk

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CGPA</title>
-    
+      
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     
     <link rel="stylesheet" href="{{url_for('static', filename='css/all.min.css')}}">
@@ -31,7 +31,7 @@
         <a href="{{ url_for('cgpa') }}"> <i class="fa-solid fa-chart-column"></i>CGPA Calculator</a>
 
         <a href="{{ url_for('dashboard') }}"> <i class="fa-solid fa-chart-column"></i>Dashboard</a>
-        <a href="{{ url_for('dashboard_card') }}"> <i class="fa-solid fa-chart-column"></i>Dashboard_card</a>
+        <a href="{{ url_for('grade_predictor') }}"> <i class="fa-solid fa-chart-column"></i>Grade Predictor</a>
 
         <a href="{{ url_for('blog') }}"> <i class="fa-solid fa-newspaper"></i>Blog</a>
 
@@ -73,9 +73,9 @@
   <h2>Semester & Session Management</h2>
   <p>Select the academic session and semester to manage your courses</p>
  
-  <div class="form-row" style="gap: 15px; margin-top: 15px;">
+  <div class="form-row">
     <!-- Academic Session Dropdown -->
-    <div class="form-group" style="flex: 1;">
+    <div class="form-group">
       <label for="choose-session">Academic Session</label>
       <select id="choose-session">
         <option value="">Choose Session</option>
@@ -88,7 +88,7 @@
     </div>
 
     <!-- Semester Dropdown -->
-    <div class="form-group" style="flex: 1;">
+    <div class="form-group" >
       <label for="choose-semester">Semester</label>
       <select id="choose-semester">
         <option value="">Choose Semester</option>
@@ -97,16 +97,8 @@
       </select>
     </div>
   </div>
+
 </div> 
-  
-   <!-- <div class="form-group">
-     <select id="choose-semester" >
-        <option value="">Choose Semester</option>
-        <option value="1"> First Semester</option>
-        <option value="2">Second  Semester</option>
-     </select>
-    </div>
-</div>  -->
 
 
 
@@ -185,7 +177,7 @@
       <span>Semester 1 GPA</span> <br>
     <strong id="semester-1-gpa">0.00</strong>
   </div>
-  </div>
+  
    <div class="summary-item">
     <span>Semester 2 GPA</span> <br>
     <strong id="semester-2-gpa">0.00</strong>

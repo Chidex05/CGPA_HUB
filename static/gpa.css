@@ -254,33 +254,87 @@ th{
 
  @media screen and (max-width: 1024px) {
 
-  .form-group input,
-  .form-group select {
-    width: 90% !important;
-    padding: 12px 20px !important;
+
+  .page-content {
+    display: grid;
+    grid-template-columns: 1.8fr 1fr;
+    width: 98%; 
+    gap: 20px;
+    align-items: start;
   }
 
-  .form-group #choose-semester {
-    width: 75% !important;
+  .card {
+    grid-column: 1;
+    width: 100%;
   }
+
+  .courses-section {
+    grid-column: 1;
+    width: 100%;
+  }
+
   .summary-card {
+    grid-column: 2;
     height: auto !important;
     padding: 20px !important;
   }
-  .course-heading1{
-    display: block;
-    line-height:28px;
 
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr; 
+    gap: 15px;
+    padding: 20px; 
   }
-  .course-heading1 .newspaper h2{
-    font-size:25px;
-    font-weight: 600;
+
+  #add-course.btn {
+    width: 100%;
+    margin-top: 5px;
+  }
+
+  .form-group input,
+  .form-group select {
+    padding: 12px 15px !important;
+  }
+
+  .form-group #choose-semester {
+    width: 100% !important;
+  }
+
+
+  .table-wrap {
+    position: relative;
+    margin-top:5em;
+    width: 100%;
+    overflow-x: auto; 
+    -webkit-overflow-scrolling: touch;
+  }
+
+  table {
+    width: 100%;
+    min-width: 0; 
   }
 
   th, td {
-    padding: 10px 25px !important;
+    padding: 10px 12px !important;
+  }
+
+
+  .gpa-hero {
+    display: flex;
+    gap: 20px;
+  }
+
+  .course-heading1 {
+    display: block;
+    line-height: 28px;
+  }
+
+  .course-heading1 .newspaper h2 {
+    font-size: 25px;
+    font-weight: 600;
   }
 }
+
  
 @media screen and (max-width: 768px) {
   br {
@@ -416,7 +470,7 @@ th{
 
 .table-wrap { 
   width: 100%; 
-  overflow-x: auto; 
+  overflow-x: hidden; 
   position: static !important;
   top: 0 !important;
   box-sizing: border-box;
@@ -424,7 +478,7 @@ th{
 }
 table { 
   width: 100%; 
-  min-width: 500px; 
+  min-width: 0; 
   border-collapse: collapse;
   padding: 0; 
 }
@@ -442,6 +496,50 @@ th, td {
 
 
 @media screen and (max-width: 480px) {
+
+  
+  #nav-bar {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between;
+    align-items: center;
+    /* padding: 1.5em 5%; */
+    width: 100%;
+  }
+
+  .menu-toggle {
+    display: block !important;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 6px;
+    order: 2; 
+  }
+
+  .fa-moon {
+    order: 3;
+  }
+
+  #nav-bar .main-nav {
+    display: none; 
+    flex-direction: column;
+    width: 100%;
+    order: 4;
+    margin-top: 15px;
+    gap: 8px;
+  }
+
+  #nav-bar .main-nav.active {
+    display: flex !important;
+  }
+
+  #nav-bar .main-nav a {
+    display: block;
+    padding: 14px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    width: 100%;
+  } */
+
   .page-content {
     width: 90% !important;
     padding: 5px !important;
@@ -459,8 +557,14 @@ th, td {
  .summary-card{
   order: 3;
  }
+.table-wrap{
+     width: 100%;
+    box-sizing: border-box;
+    padding: 15px !important;
+    overflow-x: hidden;
 
-  .card, .summary-card, .table-wrap {
+}
+  .card, .summary-card {
     width: 100%;
     box-sizing: border-box;
     padding: 15px !important;
@@ -485,7 +589,8 @@ th, td {
   
   table{
     width: 100%;
-    min-width: 400px;
+    min-width: 0;
+    table-layout: fixed;
     border-collapse: collapse;
   }
   .quote{

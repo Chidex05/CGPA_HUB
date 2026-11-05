@@ -196,6 +196,10 @@
    margin: auto;
 
 }
+.quote{
+  text-align:center;
+  margin-top:4em;
+}
 
 
 
@@ -284,9 +288,7 @@
   .blog-page {
     flex-direction: column-reverse; 
     height: auto;
-    width: 95%;
-    gap: 20px;
-    padding: 20px;
+
   }
 
   .blog-image {
@@ -323,8 +325,7 @@
   /* Grid adjustment for items cards */
   .all-article {
     grid-template-columns: repeat(2, 1fr); /* 2 columns on tablets/pads */
-    width: 95%;
-    gap: 20px;
+
   }
 
   .article-image {
@@ -334,13 +335,6 @@
   .article-image img {
     height: 100%;
   }
-
-  /* Search component container query override adjustments if used inside layout page */
-  /* .gpa-hero {
-    flex-direction: column;
-    gap: 20px;
-    text-align: center;
-  } */
 
   #search-bar {
     width: 100%;
