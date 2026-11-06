@@ -6,7 +6,7 @@
      <script> window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-        Gtag('config', 'G-HCTF51D4DP');
+        gtag('config', 'G-HCTF51D4DP');
         </script>
 
 
@@ -61,6 +61,15 @@
   <p class="card-subtitle">Set your graduation target to see what you need next semester.</p>
   
   <div class="goal-form">
+    <div class="form-group">
+       <label for="current-cgpa-input">Current CGPA</label>
+      <input type="number" id="current-cgpa" min="1.0" max="5.0" step="0.01" placeholder="e.g. 3.75">
+    </div>
+    <div class="form-group">
+      <label for="current-units-input">Total Units Completed</label>
+      <input type="number" id="completed-units" min="1" placeholder="e.g. 120">
+    </div>
+
     <div class="form-group">
       <label for="target-cgpa-input">Graduation Target CGPA</label>
       <input type="number" id="target-cgpa-input" min="1.0" max="5.0" step="0.01" placeholder="e.g. 4.50">
