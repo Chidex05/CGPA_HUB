@@ -112,18 +112,30 @@
 }
 
 /* --- Micro Layout Media View Breaks --- */
-@media screen and (max-width: 480px) {
+@media screen and (max-width: 430px) {
   .goal-form .form-group input {
     padding: 14px;
     font-size: 16px; /* Prevents auto-zoom scaling bugs on mobile safari browsers */
   }
+   
   .goal-result-box h3 {
     font-size: 24px;
+  }
+  .moon{
+    display: none;
   }
   .dash-action-btn{
     font-size: 14px;
     width: 50%;
     height: 10vh;
+  }
+      #nav-bar {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5em 5%;
+    width: 100%;
   }
 
 }

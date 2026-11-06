@@ -351,21 +351,18 @@
 
 }
 
-/* --- 480PX MOBILE BREAKPOINT (Extra protection for phones) --- */
-@media screen and (max-width: 480px) {
-  .all-article {
-    grid-template-columns: 1fr; /* Switch to crisp 1 column stack pattern on pure phones viewports */
-  }
-}
-
 
 /* --- 480PX MOBILE BREAKPOINT (Smartphones) --- */
-@media screen and (max-width: 480px) {
+@media screen and (max-width: 430px) {
   /* Move article streams into a beautiful singular column layout */
   .all-article {
     grid-template-columns: 1fr !important; 
     gap: 25px !important;
   }
+  .moon{
+    display: none;
+  }
+    
 
   /* Scale down massive headlines inside the main featured section */
   .blog-hero h1 {
@@ -386,6 +383,14 @@
     height: 70vh;
     font-size: 15px;
     text-align: center;
+  }
+      #nav-bar {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5em 5%;
+    width: 100%;
   }
 
 }

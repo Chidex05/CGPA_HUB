@@ -12,34 +12,34 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='gpa.css') }}">
 </head>
 <body class="background">
-
-    <div id="nav-bar">
+     <div id="nav-bar">
       <div class="logo">
-         <h2> 
+         <h2>
         <i class="fa-solid fa-graduation-cap"></i>CGPA <span>Hub</span></h2>
          <small>Calculate . Track . Excel</small>
       </div> 
-
       <button class="menu-toggle" id="menu-toggle" aria-label="Open navigation" aria-expanded="false" aria-controls="main-nav">
          <i class="fa-solid fa-bars"></i>
-
       </button>
-
       <nav class="main-nav" id="main-nav">
-            <a href="{{ url_for('home') }}"> <i class="fa-solid fa-home"></i>  Home</a> 
+        <a href="{{ url_for('home') }}"> <i class="fa-solid fa-home"></i>  Home</a>
 
-        <a href="gpa-calculator"><i class="fa-solid fa-calculator"></i>GPA Calculator</a>
+        <a href="{{ url_for('gpa') }}"><i class="fa-solid fa-calculator"></i>GPA Calculator</a>
 
         <a href="{{ url_for('cgpa') }}"> <i class="fa-solid fa-chart-column"></i>CGPA Calculator</a>
          <a href="{{ url_for('dashboard') }}"> <i class="fa-solid fa-chart-column"></i>Dashboard</a>
-        <a href="{{ url_for('grade_predictor') }}"> <i class="fa-solid fa-chart-column"></i>Grade Predictor</a>
+         <a href="{{ url_for('grade_predictor') }}"> <i class="fa-solid fa-chart-column"></i>Grade Predictor</a>
+
 
 
         <a href="{{ url_for('blog') }}"> <i class="fa-solid fa-newspaper"></i>Blog</a>
-
+       
       </nav>
-      <i class="fa-solid fa-moon"></i>
-    </div>
+         <i class="fa-solid fa-moon moon"></i>
+         </div>
+      
+
+    
 
 <section>
     <div class="gpa-hero">

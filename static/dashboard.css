@@ -311,7 +311,7 @@ transition: width 0.3s ease-in-out;
   }
 }
 
-@media screen and (max-width: 480px) {
+@media screen and (max-width: 430px) {
   .dashboard-container {
     width: 100%;
     padding: 15px;
@@ -325,6 +325,9 @@ transition: width 0.3s ease-in-out;
   .dashboard-details{
     display: block;
     gap: 7px;
+  }
+  .moon{
+    display: none;
   }
     #nav-bar {
     display: flex !important;

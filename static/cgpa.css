@@ -482,7 +482,7 @@ th{
 }
 
  
-@media screen and (max-width: 480px) {
+@media screen and (max-width: 430px) {
   * {
     box-sizing: border-box !important;
   }
@@ -491,6 +491,11 @@ th{
     width: 100% !important;
     overflow-x: hidden !important;
   }
+  .moon{
+    display: none;
+
+  }
+
     #nav-bar {
     display: flex !important;
     flex-direction: row !important;
@@ -498,6 +503,7 @@ th{
     align-items: center;
     padding: 1.5em 5%;
     width: 100%;
+        /* flex-wrap: nowrap; */
   }
 
 
@@ -508,7 +514,9 @@ th{
     display: flex !important;
     flex-direction: column !important; 
   }
-
+   .hero-text{
+    font-size: 13px;
+  }
   .control-div {
     width: 100% !important;
     display: flex !important;
@@ -570,6 +578,16 @@ th{
   th, td {
     padding: 10px 12px !important;
     font-size: 13px !important;
+  }
+    .gpa-heading{
+    gap: 0;
+  }
+
+  .gpa-image{
+    width: 150px;
+    height: 150px;
+    flex-shrink: 0;
+    object-fit: contain;
   }
  
 } 

@@ -3,18 +3,32 @@
     margin: 0%;
     box-sizing: border-box;
 }
-.background{
-    font-family: sans-serif;
-}
 #nav-bar{
     display: flex;
     justify-content: space-around;
     font-family: sans-serif;
     font-weight: 600;
     border-bottom: 2px solid #3e0c89 ;
-    
+    padding: 2em 0;
 
 }
+.background{
+    font-family: sans-serif;
+}
+#nav-bar .main-nav a{
+    text-decoration: none;
+    color: white;
+    padding: 30px;
+    
+}
+.menu-toggle{
+    display: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 22px;
+    border: 1px solid rgba(192, 132, 252, 0.4);
+}
+
 .gpa-hero,.gpa-heading{
     display: flex;
     justify-content: space-around;
@@ -254,7 +268,50 @@ th{
 
  @media screen and (max-width: 1024px) {
 
+  
+    #nav-bar{
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    width: 95%;
+    margin: auto;
 
+  }
+  
+  .menu-toggle {
+    display: block !important; /* Reveals the hamburger toggle button */
+    color: white;
+    padding: 8px 14px;
+    border-radius: 6px;
+    order: 2; /* Positions button nicely alongside the logo and moon */
+  }
+
+  .fa-moon {
+    order: 3; /* Keeps moon icon positioned on the far end */
+  }
+  
+  #nav-bar .main-nav {
+    display: none; /* Safely hides standard horizontal row links */
+    flex-direction: column;
+    width: 100%;
+    order: 4; /* Pushes the menu list box below the core row elements */
+    margin-top: 15px;
+    gap: 8px;
+  }
+
+  /* Class injected dynamically by JavaScript when clicked */
+  #nav-bar .main-nav.active {
+    display: flex !important;
+  }
+
+  #nav-bar .main-nav a {
+    display: block;
+    padding: 14px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    width: 80%;
+    margin: auto;
+  }
   .page-content {
     display: grid;
     grid-template-columns: 1.8fr 1fr;
@@ -342,35 +399,36 @@ th{
   }
   body, html {
     width: 100%;
+    margin: auto;
     overflow-x: hidden;
   }
 
   #nav-bar {
-    display: flex !important;
+    display: flex;
     flex-direction: row !important;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5em 5%;
+    justify-content: space-around;
+    flex-wrap:wrap;
+
     width: 95%;
   }
 
-  .menu-toggle {
+   .menu-toggle {
     display: block !important;
     color: white;
-    padding: 8px 14px;
+     padding: 12px 14px; 
     border-radius: 6px;
     order: 2; 
   }
 
   .fa-moon {
     order: 3;
-  }
-
+  } 
+ 
   #nav-bar .main-nav {
     display: none; 
     flex-direction: column;
     width: 100%;
-    order: 4;
+    /* order: 4; */
     margin-top: 15px;
     gap: 8px;
   }
@@ -384,47 +442,45 @@ th{
     padding: 14px 20px;
     background: rgba(255, 255, 255, 0.05);
     border-radius: 6px;
-    width: 100%;
-  }
+    width: 80%;
+    margin:auto;
+  } 
 
-
+ 
   .page-content { 
   display: flex !important;       
   flex-direction: column !important; 
   gap: 30px; 
   padding: 20px; 
-  width: 100%;
+  /* width: 100%; */
   box-sizing: border-box;
 }
 
---- Strict Order Assignment ---
 .card { 
-  order: 1 !important;            /* 1st: Add Course Form stays at the top */
+  order: 1 !important;          
   width: 100% !important;
   box-sizing: border-box;
 }
 
 .courses-section { 
-  order: 2 !important;            /* 2nd: Added Courses Table moves right under form */      
+  order: 2 !important;                
   margin-top: 0 !important;
   width: 100% !important;
   box-sizing: border-box;
 }
 
 .summary-card { 
-  order: 3 !important;            /* 3rd: Summary Card goes to the very bottom */
+  order: 3 !important;            
   width: 100% !important;
   box-sizing: border-box;
 }
 
-/* --- FIXED: Removed relative position shifts causing layout breakage --- */
 .course-heading {
-  position: static !important; /* Back into the natural document flow */
+  position: static !important; 
   top: 0 !important;
   margin-bottom: 15px;
 }
 
-/* --- Form Layout --- */
 .form-row { 
   display: flex;
   flex-direction: column;
@@ -452,7 +508,7 @@ th{
   box-sizing: border-box;
 }
 
-/* --- Summary Card Fixes --- */
+
 .summary-card {
   display: flex;
   flex-direction: column;
@@ -485,7 +541,7 @@ table {
 th, td { 
   padding: 12px 10px; 
   text-align: left;
-}
+} 
   
 }
 
@@ -495,16 +551,17 @@ th, td {
 
 
 
-@media screen and (max-width: 480px) {
+@media screen and (max-width: 430px) {
 
   
   #nav-bar {
     display: flex !important;
     flex-direction: row !important;
-    justify-content: space-between;
+    justify-content: space-between !important;
     align-items: center;
-    /* padding: 1.5em 5%; */
+    padding: 1.5em 5% ;
     width: 100%;
+
   }
 
   .menu-toggle {
@@ -513,6 +570,9 @@ th, td {
     padding: 8px 14px;
     border-radius: 6px;
     order: 2; 
+  }
+  .moon{
+    display: none;
   }
 
   .fa-moon {
@@ -595,5 +655,20 @@ th, td {
   }
   .quote{
     margin-top: 8em;
+    font-size:10px;
+    width:90%;
+    margin:auto;
+  }
+  .gpa-heading{
+    gap: 0;
+  }
+  .hero-text{
+    font-size: 13px;
+  }
+  .gpa-image{
+    width: 150px;
+    height: 150px;
+    flex-shrink: 0;
+    object-fit: contain;
   }
 }
