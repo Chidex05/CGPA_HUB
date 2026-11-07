@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 
+from flask import Flask, render_template, request, jsonify,Response,send_from_directory
+
 app = Flask(__name__)
 
 @app.route('/')
@@ -28,39 +30,39 @@ def dashboard():
 def grade_predictor():
     return render_template('grade_predictor.html')
 
+from flask import send_from_directory, Response
 
-from flask import Flask, render_template, request, jsonify,Response,send_from_directory
-
-@app.route('google522d4e4c65fb761d.html')
+@app.route('/google522d4e4c65fb761d.html')
 def google_verification():
     return send_from_directory('static', 'google522d4e4c65fb761d.html')
 
-@app.route('/sitemap.xml') 
-def sitemap(): 
-    urls="""  
-     <url>
+@app.route('/sitemap.xml')
+def sitemap():
+    urls = """
+    <url>
         <loc>https://cgpa-hub-ecru.vercel.app/</loc>
-     </url>
-     <url>
+    </url>
+    <url>
         <loc>https://cgpa-hub-ecru.vercel.app/gpa-calculator</loc>
-     </url>
-     <url>
+    </url>
+    <url>
         <loc>https://cgpa-hub-ecru.vercel.app/cgpa-calculator</loc>
-     </url>
-     <url>
+    </url>
+    <url>
         <loc>https://cgpa-hub-ecru.vercel.app/grade_predictor</loc>
-     </url>
-     <url>
+    </url>
+    <url>
         <loc>https://cgpa-hub-ecru.vercel.app/blog</loc>
-     </url>
-   </urlset>""" 
-    xml= f"""<?xml version="1.0" encoding="UTF-8"?>
-   <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-   {urls}
-    </urlset>"""
+    </url>
+    """
+    
+    xml_content = f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    {urls}
+</urlset>"""
+    
+    return Response(xml_content, mimetype='application/xml')
 
-
-    return Response(xml, mimetype='appliication/xml')
 
 @app.route('/calculate-gpa', methods=['POST'])
 def calculate_gpa():
