@@ -29,7 +29,11 @@ def grade_predictor():
     return render_template('grade_predictor.html')
 
 
-from flask import Flask, render_template, request, jsonify,Response
+from flask import Flask, render_template, request, jsonify,Response,send_from_directory
+
+@app.route('google522d4e4c65fb761d.html')
+def google_verification():
+    return send_from_directory('static', 'google522d4e4c65fb761d.html')
 
 @app.route('/sitemap.xml') 
 def sitemap(): 
@@ -38,10 +42,10 @@ def sitemap():
         <loc>https://cgpa-hub-ecru.vercel.app/</loc>
      </url>
      <url>
-        <loc>https://cgpa-hub-ecru.vercel.app/gpa</loc>
+        <loc>https://cgpa-hub-ecru.vercel.app/gpa-calculator</loc>
      </url>
      <url>
-        <loc>https://cgpa-hub-ecru.vercel.app/cgpa</loc>
+        <loc>https://cgpa-hub-ecru.vercel.app/cgpa-calculator</loc>
      </url>
      <url>
         <loc>https://cgpa-hub-ecru.vercel.app/grade_predictor</loc>
