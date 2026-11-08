@@ -30,7 +30,6 @@ const courselist = document.getElementById("course-list");
 // PREVENT HTML INJECTION
 
 function escapeHTML(value) {
-    // If the value is missing, undefined, or null, safely return a blank string instead of crashing
     if (value === undefined || value === null) {
         return "";
     }
@@ -43,7 +42,6 @@ function escapeHTML(value) {
     })[character]);
 }
 
-// RENDER TABLE UI (Shows matching courses, or all saved courses if dropdowns are blank)
 function displayCourses() {
     courselist.innerHTML = "";
     
@@ -85,17 +83,17 @@ function displayCourses() {
         </td>`;
         courselist.appendChild(row);
     });
-}
+    }
 
-// Filter layout dynamically when dropdown menus change
+
 if (sessionSelect) sessionSelect.addEventListener("change", displayCourses);
 if (semesterSelect) semesterSelect.addEventListener("change", displayCourses);
 
-// ADD / EDIT SUBMIT EVENT
 addCourseBtn.addEventListener("click", () => {
     const session = sessionSelect ? sessionSelect.value : "";
     const semester = semesterSelect ? semesterSelect.value : "";
     const code = courseCode.value.trim();
+
     const unit = Number(courseUnit.value);
     const grade = gradeSelect.value;
 
@@ -136,14 +134,11 @@ addCourseBtn.addEventListener("click", () => {
     localStorage.setItem("cgpaCourses", JSON.stringify(courses));
     displayCourses();
 
-
-    // Clear inputs (keeps session/semester selected for quick data entry)
     courseCode.value = "";
     courseUnit.value = "";
     gradeSelect.value = "";
 });
 
-// REMOVE EVENT
 courselist.addEventListener("click", (event) => {
     if (event.target.classList.contains("remove-course")) {
         const row = event.target.closest("tr");
@@ -203,7 +198,7 @@ async function runCalculation() {
         const response = await fetch("/calculate-cgpa", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ courses: courses })
+            body: JSON.stringify({ courses: courses, selected_semester: semesterSelect.value })
         });
 
         const result = await response.json();
