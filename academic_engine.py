@@ -80,6 +80,7 @@ def calculate_academic_record(courses, university="RSU"):
 
         elif semester in["2", "second semester", "2nd semester"]:
             semester="2"
+        else:
             raise ValueError("Invalid semester.")
 
 
