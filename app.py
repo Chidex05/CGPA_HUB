@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify
+from academic_engine import calculate_academic_record
 
 app = Flask(__name__)
 
@@ -7,7 +8,7 @@ def home():
     return render_template('home.html')
 
 
-@app.route('/cgpa-calculator')
+@app.route(  )
 def cgpa():
     return render_template('cgpa.html')
 
@@ -76,62 +77,54 @@ def calculate_gpa():
         return jsonify({"error": "Please check your course information"}), 400
 
 
+
 @app.route('/calculate-cgpa', methods=['POST'])
 def calculate_cgpa():
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
     courses = data.get('courses', [])
 
-    grade_points = {
-        'A': 5, 'B': 4, 'C': 3, 'D': 2, 'E': 1, 'F': 0
-    }
+    try:
+        result = calculate_academic_record(
+            courses,
+            university="RSU"
+        )
 
-    if not courses:
-        return jsonify({'error': 'Please add at least one course.'}), 400
+        semester_1_gpa = 0
+        semester_2_gpa = 0
 
-    total_units = 0
-    total_points = 0
+        semester_results = result["semester_results"]
 
-    # Track variables to separate semesters overall
-    semester_1_units = 0
-    semester_1_points = 0
-    semester_2_units = 0
-    semester_2_points = 0
+        # Identify the latest academic session
+        sessions = sorted(set(
+            record["session"] for record in semester_results
+        ))
 
-    for course in courses:
-        unit = int(course['unit'])
-        grade = course['grade'].upper()
-        semester = str(course.get('semester', '1'))
+        latest_session = sessions[-1] if sessions else None
 
-        if unit <= 0:
-            return jsonify({'error': 'Credit units must be greater than zero.'}), 400
+        # Retrieve GPA for each semester in the latest session
+        for record in semester_results:
+            if record["session"] == latest_session:
 
-        if grade not in grade_points:
-            return jsonify({'error': 'Invalid grade entered.'}), 400
+                if record["semester"] == "1":
+                    semester_1_gpa = record["gpa"]
 
-        points = unit * grade_points[grade]
-        total_units += unit
-        total_points += points
+                elif record["semester"] == "2":
+                    semester_2_gpa = record["gpa"]
 
-        # Group data into universal semester variables safely
-        if semester == '1':
-            semester_1_units += unit
-            semester_1_points += points
-        elif semester == '2':
-            semester_2_units += unit
-            semester_2_points += points
+        return jsonify({
+            "total_units": result["total_units"],
+            "total_points": result["total_points"],
+            "cgpa": result["cgpa"],
+            "semester_1_gpa": semester_1_gpa,
+            "semester_2_gpa": semester_2_gpa,
+            "semester_results": semester_results
+        })
 
-    # Calculate final cumulative tracking scores
-    cgpa = total_points / total_units if total_units > 0 else 0
-    semester_1_gpa = semester_1_points / semester_1_units if semester_1_units > 0 else 0
-    semester_2_gpa = semester_2_points / semester_2_units if semester_2_units > 0 else 0
+    except (ValueError, TypeError, KeyError) as error:
+        return jsonify({
+            "error": str(error)
+        }), 400
 
-    return jsonify({
-        'total_units': total_units,
-        'total_points': total_points,
-        'semester_1_gpa': semester_1_gpa,
-        'semester_2_gpa': semester_2_gpa,
-        'cgpa': cgpa
-    })
 
 
 if __name__ == '__main__':
