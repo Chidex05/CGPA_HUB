@@ -1,3 +1,6 @@
+
+console.log("cgpa.js loaded successfully");
+
 const menuToggle= document.getElementById("menu-toggle");
 const mainNav= document.getElementById("main-nav");
 if (menuToggle && mainNav){
