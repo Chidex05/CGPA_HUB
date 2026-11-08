@@ -1,6 +1,4 @@
 
-console.log("cgpa.js loaded successfully");
-
 const menuToggle= document.getElementById("menu-toggle");
 const mainNav= document.getElementById("main-nav");
 if (menuToggle && mainNav){
@@ -222,11 +220,12 @@ async function runCalculation() {
         }
 
         document.getElementById("total-units").textContent = result.total_units;
-        document.getElementById("gpa-result").textContent = Number(result.cgpa).toFixed(2);
+        document.getElementById("gpa-result").textContent = Number(result.cgpa).toFixed(2);}
 
-    } catch (error) {
-        console.error("Calculation background error:", error.message);
-    }
+  catch (error) {
+    console.error("Calculation background error:", error);
+    alert(error.message);
+}
 }
 
 // Manual Calculation Button Wrapper
