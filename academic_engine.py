@@ -74,7 +74,16 @@ def calculate_academic_record(courses, university="RSU"):
         points = validated["points"]
 
         session = str(course.get("session", "")).strip()
-        semester = str(course.get("semester", "")).strip()
+        semester = str(course.get("semester", "")).strip().lower()
+        if semester in["1", "first semester", "1st semester"]:
+            semester="1"
+
+        elif semester in["2", "second semester", "2nd semester"]:
+            semester="2"
+            raise ValueError("Invalid semester.")
+
+
+
 
         if not session or not semester:
             raise ValueError(
