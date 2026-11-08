@@ -14,8 +14,6 @@ UNIVERSITY_RULES = {
             "F": 0
         }
     }
-}
-
 
 def get_university_rules(university="RSU"):
     rules = UNIVERSITY_RULES.get(university)
