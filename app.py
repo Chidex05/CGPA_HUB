@@ -76,11 +76,12 @@ def calculate_gpa():
         return jsonify({"error": "Please check your course information"}), 400
 
 
-
+        
 @app.route('/calculate-cgpa', methods=['POST'])
 def calculate_cgpa():
     data = request.get_json(silent=True) or {}
     courses = data.get('courses', [])
+    selected_session = str(data.get('selected_session', '')).strip()
 
     try:
         result = calculate_academic_record(
@@ -91,18 +92,8 @@ def calculate_cgpa():
         semester_1_gpa = 0
         semester_2_gpa = 0
 
-        semester_results = result["semester_results"]
-
-        # Identify the latest academic session
-        sessions = sorted(set(
-            record["session"] for record in semester_results
-        ))
-
-        latest_session = sessions[-1] if sessions else None
-
-        # Retrieve GPA for each semester in the latest session
-        for record in semester_results:
-            if record["session"] == latest_session:
+        for record in result["semester_results"]:
+            if record["session"] == selected_session:
 
                 if record["semester"] == "1":
                     semester_1_gpa = record["gpa"]
@@ -114,16 +105,16 @@ def calculate_cgpa():
             "total_units": result["total_units"],
             "total_points": result["total_points"],
             "cgpa": result["cgpa"],
+            "selected_session": selected_session,
             "semester_1_gpa": semester_1_gpa,
             "semester_2_gpa": semester_2_gpa,
-            "semester_results": semester_results
+            "semester_results": result["semester_results"]
         })
 
     except (ValueError, TypeError, KeyError) as error:
         return jsonify({
             "error": str(error)
         }), 400
-
 
 
 if __name__ == '__main__':

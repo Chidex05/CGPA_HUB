@@ -86,7 +86,7 @@ function displayCourses() {
     }
 
 
-if (sessionSelect) sessionSelect.addEventListener("change", displayCourses);
+if (sessionSelect) {sessionSelect.addEventListener("change", displayCourses);}
 if (semesterSelect) semesterSelect.addEventListener("change", displayCourses);
 
 addCourseBtn.addEventListener("click", () => {
@@ -198,7 +198,7 @@ async function runCalculation() {
         const response = await fetch("/calculate-cgpa", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ courses: courses, selected_semester: semesterSelect.value })
+            body: JSON.stringify({ courses: courses, selected_session: semesterSelect.value })
         });
 
         const result = await response.json();
@@ -237,12 +237,6 @@ calculateBtn.addEventListener("click", () => {
     
 });
 
-
-// Boot app, render cached courses, and pull historical calculation data on page startup sequence
-window.addEventListener("DOMContentLoaded", function() {
-    displayCourses();
-    runCalculation(); 
-});
 
 
 
