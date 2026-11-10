@@ -1,0 +1,34 @@
+{% extends "admin/base.html" %}
+{% block title %}Overview{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div><p class="eyebrow">YOUR WORKSPACE</p><h1>Overview</h1><p>A quick look at your content and site activity.</p></div>
+  <a class="button button-primary" href="{{ url_for('admin.new_post') }}"><i class="fa-solid fa-plus" aria-hidden="true"></i> New article</a>
+</section>
+
+<section class="stat-grid" aria-label="Site summary">
+  <article class="stat-card"><span class="stat-icon purple"><i class="fa-solid fa-newspaper" aria-hidden="true"></i></span><p>Published articles</p><strong>{{ summary.published_posts }}</strong><a href="{{ url_for('admin.posts') }}">Manage articles <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></article>
+  <article class="stat-card"><span class="stat-icon amber"><i class="fa-regular fa-file-lines" aria-hidden="true"></i></span><p>Drafts</p><strong>{{ summary.draft_posts }}</strong><a href="{{ url_for('admin.posts') }}">Review drafts <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></article>
+  <article class="stat-card"><span class="stat-icon green"><i class="fa-solid fa-eye" aria-hidden="true"></i></span><p>Page views today</p><strong>{{ summary.views_today }}</strong><span class="stat-note">Aggregated, no personal data</span></article>
+  <article class="stat-card"><span class="stat-icon blue"><i class="fa-solid fa-chart-line" aria-hidden="true"></i></span><p>Page views this week</p><strong>{{ summary.views_week }}</strong><a href="{{ url_for('admin.analytics') }}">See analytics <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></article>
+</section>
+
+<div class="dashboard-grid">
+  <section class="panel">
+    <div class="panel-heading"><div><h2>Recent articles</h2><p>Your latest edits and publishing activity.</p></div><a href="{{ url_for('admin.posts') }}">View all</a></div>
+    {% if recent_posts %}
+    <div class="table-wrap"><table><thead><tr><th>Article</th><th>Status</th><th>Last updated</th></tr></thead><tbody>
+      {% for post in recent_posts %}
+      <tr><td><a class="table-title" href="{{ url_for('admin.edit_post', post_id=post.id) }}">{{ post.title }}</a></td><td><span class="status {% if post.is_published %}status-published{% else %}status-draft{% endif %}">{% if post.is_published %}Published{% else %}Draft{% endif %}</span></td><td>{{ post.updated_at[:10] }}</td></tr>
+      {% endfor %}
+    </tbody></table></div>
+    {% else %}<p class="panel-empty">No articles yet. Create your first post to get started.</p>{% endif %}
+  </section>
+  <section class="panel">
+    <div class="panel-heading"><div><h2>Most viewed pages</h2><p>Last 7 days</p></div><a href="{{ url_for('admin.analytics') }}">Details</a></div>
+    {% if top_pages %}
+    <ul class="page-list">{% for page in top_pages %}<li><span>{{ page.path }}</span><strong>{{ page.views }}</strong></li>{% endfor %}</ul>
+    {% else %}<p class="panel-empty">Page-view totals will appear as visitors browse your site.</p>{% endif %}
+  </section>
+</div>
+{% endblock %}

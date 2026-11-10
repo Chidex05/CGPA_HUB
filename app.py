@@ -1,11 +1,24 @@
-from flask import Flask, render_template, request, jsonify
+import os
+from datetime import date
+
+from flask import Flask, abort, render_template, request, jsonify
 from academic_engine import calculate_academic_record
+from admin import admin_bp, close_db, get_content, get_db, initialize_database
+from database import DatabaseError
 
 app = Flask(__name__)
+app.config["SESSION_COOKIE_HTTPONLY"] = True
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+app.config["SESSION_COOKIE_SECURE"] = (
+os.environ.get("SESSION_COOKIE_SECURE", "false").lower() == "true"
+)
+app.register_blueprint(admin_bp)
+app.teardown_appcontext(close_db)
+initialize_database(app)
 
 @app.route('/')
 def home():
-    return render_template('home.html')
+    return render_template('home.html', content=get_content())
 
 @app.route('/cgpa')
 def cgpa():
@@ -13,7 +26,34 @@ def cgpa():
 
 @app.route('/blog')
 def blog():
-    return render_template('blog.html')
+    database = get_db()
+    posts = database.execute(
+        """
+        SELECT * FROM posts
+        WHERE is_published = 1
+        ORDER BY is_featured DESC, created_at DESC, id DESC
+        """
+    ).fetchall()
+    featured = next((post for post in posts if post["is_featured"]), None)
+    if featured is None and posts:
+        featured = posts[0]
+    return render_template(
+        'blog.html',
+        posts=posts,
+        featured=featured,
+        content=get_content(),
+    )
+
+
+@app.route('/blog/<slug>')
+def blog_article(slug):
+    post = get_db().execute(
+        "SELECT * FROM posts WHERE slug = ? AND is_published = 1",
+        (slug,),
+    ).fetchone()
+    if post is None:
+        abort(404)
+    return render_template('article.html', post=post, content=get_content())
 
 
 @app.route('/gpa-calculator')
@@ -27,6 +67,35 @@ def dashboard():
 @app.route('/grade_predictor')
 def grade_predictor():
     return render_template('grade_predictor.html')
+
+
+@app.context_processor
+def inject_current_year():
+    return {"now_year": date.today().year}
+
+
+@app.after_request
+def record_public_pageview(response):
+    tracked_pages = {"home", "blog", "blog_article", "gpa", "cgpa", "dashboard", "grade_predictor"}
+    if (
+        request.method == "GET"
+        and request.endpoint in tracked_pages
+        and response.status_code < 400
+    ):
+        try:
+            database = get_db()
+            database.execute(
+                """
+                INSERT INTO daily_pageviews (view_date, path, views)
+                VALUES (?, ?, 1)
+                ON CONFLICT(view_date, path) DO UPDATE SET views = views + 1
+                """,
+                (date.today().isoformat(), request.path),
+            )
+            database.commit()
+        except DatabaseError:
+            app.logger.exception("Could not record an aggregated page view")
+    return response
 
 
 @app.route('/calculate-gpa', methods=['POST'])
@@ -118,4 +187,4 @@ def calculate_cgpa():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=os.environ.get("FLASK_DEBUG", "").lower() == "true")

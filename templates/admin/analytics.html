@@ -1,0 +1,30 @@
+{% extends "admin/base.html" %}
+{% block title %}Site analytics{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div><p class="eyebrow">UNDERSTAND YOUR REACH</p><h1>Site analytics</h1><p>Aggregated page views for the last 30 days.</p></div>
+</section>
+<section class="analytics-summary">
+  <article class="stat-card"><span class="stat-icon purple"><i class="fa-solid fa-eye" aria-hidden="true"></i></span><p>Total page views</p><strong>{{ period_total }}</strong><span class="stat-note">Last 30 days</span></article>
+  <div class="privacy-note"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i><div><strong>Privacy first</strong><p>Only daily page totals are stored. No visitor names, account data, IP addresses, or browsing profiles are collected.</p></div></div>
+</section>
+<div class="dashboard-grid analytics-grid">
+  <section class="panel">
+    <div class="panel-heading"><div><h2>Daily page views</h2><p>Last 30 days</p></div></div>
+    {% if daily_views %}
+    {% set max_views = daily_views|map(attribute='views')|max %}
+    <div class="bar-chart" aria-label="Daily page view totals">
+      {% for day in daily_views %}
+      <div class="bar-row"><span>{{ day.view_date }}</span><div class="bar-track"><div class="bar-fill" style="width: {{ (day.views / max_views * 100)|round }}%"></div></div><strong>{{ day.views }}</strong></div>
+      {% endfor %}
+    </div>
+    {% else %}<p class="panel-empty">No page views recorded yet. Visit a public page to start collecting aggregate totals.</p>{% endif %}
+  </section>
+  <section class="panel">
+    <div class="panel-heading"><div><h2>Top pages</h2><p>Ranked by views for the last 30 days.</p></div></div>
+    {% if top_pages %}
+    <ul class="page-list">{% for page in top_pages %}<li><span>{{ page.path }}</span><strong>{{ page.views }}</strong></li>{% endfor %}</ul>
+    {% else %}<p class="panel-empty">Popular pages will appear here as aggregate totals build up.</p>{% endif %}
+  </section>
+</div>
+{% endblock %}

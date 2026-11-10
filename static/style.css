@@ -3,6 +3,26 @@
     margin: 0%;
     box-sizing: border-box;
 }
+.site-announcement{
+    width: min(1120px, 89%);
+    margin: 1rem auto;
+    padding: 0.8rem 1rem;
+    border: 1px solid rgba(192, 132, 252, 0.24);
+    border-radius: 10px;
+    background: rgba(124, 58, 237, 0.12);
+    color: #e4d7f6;
+    font: 0.85rem sans-serif;
+}
+.site-announcement i{
+    margin-right: 0.45rem;
+    color: #c084fc;
+}
+.site-footer-copy{
+    margin: 1rem 5%;
+    color: #b6b1c6;
+    font: 0.82rem sans-serif;
+    text-align: center;
+}
 .menu-toggle{
     display: none;
     background: transparent;
@@ -876,7 +896,6 @@ transition: width 0.3s ease-in-out;
 
 
  
-
 
 
 

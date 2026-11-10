@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin sign in | CGPA Hub</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/all.min.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}" />
+  </head>
+  <body class="login-page">
+    <main class="login-card">
+      <a class="login-brand" href="{{ url_for('home') }}">CGPA <span>Hub</span></a>
+      <p class="eyebrow">ADMIN WORKSPACE</p>
+      <h1>Welcome back</h1>
+      <p class="login-description">Sign in to manage your articles and website.</p>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-stack" aria-live="polite">
+            {% for category, message in messages %}
+              <p class="flash-message flash-{{ category }}">{{ message }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+      <form method="post" class="admin-form login-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <label for="username">Username</label>
+        <input id="username" name="username" type="text" autocomplete="username" required autofocus />
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required />
+        <button class="button button-primary button-wide" type="submit">Sign in <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+      </form>
+      <a class="back-to-site" href="{{ url_for('home') }}">← Back to CGPA Hub</a>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,16 @@
+{% extends "admin/base.html" %}
+{% block title %}Site content{% endblock %}
+{% block content %}
+<section class="page-heading"><div><p class="eyebrow">YOUR WORDS, YOUR BRAND</p><h1>Site content</h1><p>Update the copy shown on your home page and blog.</p></div></section>
+<form class="panel admin-form settings-form" method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+  <div class="form-grid">
+    <div class="field-full"><label for="home_heading">Home page headline</label><input id="home_heading" name="home_heading" maxlength="100" value="{{ content.home_heading }}" required /><span class="field-hint">The main headline visitors see on your home page.</span></div>
+    <div class="field-full"><label for="home_description">Home page introduction</label><textarea id="home_description" name="home_description" rows="3" maxlength="500">{{ content.home_description }}</textarea></div>
+    <div class="field-full"><label for="blog_intro">Blog introduction</label><textarea id="blog_intro" name="blog_intro" rows="3" maxlength="500">{{ content.blog_intro }}</textarea></div>
+    <div class="field-full"><label for="announcement">Site announcement <span class="field-hint">Leave blank to hide it</span></label><input id="announcement" name="announcement" maxlength="220" value="{{ content.announcement }}" /></div>
+    <div class="field-full"><label for="footer_text">Footer message</label><input id="footer_text" name="footer_text" maxlength="180" value="{{ content.footer_text }}" /></div>
+  </div>
+  <div class="form-actions"><button class="button button-primary" type="submit">Save content</button></div>
+</form>
+{% endblock %}

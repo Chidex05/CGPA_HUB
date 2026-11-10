@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Admin{% endblock %} | {{ content.site_name }} Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/all.min.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}" />
+  </head>
+  <body class="admin-body">
+    <aside class="admin-sidebar" id="admin-sidebar">
+      <a class="admin-brand" href="{{ url_for('admin.dashboard') }}">
+        <span class="brand-mark"><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i></span>
+        <span>{{ content.site_name }}<small>ADMIN STUDIO</small></span>
+      </a>
+      <p class="sidebar-label">WORKSPACE</p>
+      <nav class="admin-nav" aria-label="Admin navigation">
+        <a href="{{ url_for('admin.dashboard') }}" class="{% if request.endpoint == 'admin.dashboard' %}is-active{% endif %}">
+          <i class="fa-solid fa-chart-pie" aria-hidden="true"></i> Overview
+        </a>
+        <a href="{{ url_for('admin.posts') }}" class="{% if request.endpoint in ['admin.posts', 'admin.new_post', 'admin.edit_post'] %}is-active{% endif %}">
+          <i class="fa-solid fa-newspaper" aria-hidden="true"></i> Blog management
+        </a>
+        <a href="{{ url_for('admin.analytics') }}" class="{% if request.endpoint == 'admin.analytics' %}is-active{% endif %}">
+          <i class="fa-solid fa-chart-line" aria-hidden="true"></i> Site analytics
+        </a>
+        <a href="{{ url_for('admin.content_editor') }}" class="{% if request.endpoint == 'admin.content_editor' %}is-active{% endif %}">
+          <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i> Site content
+        </a>
+        <a href="{{ url_for('admin.settings') }}" class="{% if request.endpoint == 'admin.settings' %}is-active{% endif %}">
+          <i class="fa-solid fa-sliders" aria-hidden="true"></i> Website settings
+        </a>
+      </nav>
+      <div class="sidebar-bottom">
+        <a href="{{ url_for('home') }}" target="_blank" rel="noopener noreferrer">
+          <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> View website
+        </a>
+        <form action="{{ url_for('admin.logout') }}" method="post">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <button type="submit"><i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i> Sign out</button>
+        </form>
+      </div>
+    </aside>
+
+    <div class="admin-main">
+      <header class="admin-topbar">
+        <button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Toggle admin menu" aria-expanded="false">
+          <i class="fa-solid fa-bars" aria-hidden="true"></i>
+        </button>
+        <div><p>Good to see you, {{ session.get('admin_username', 'Admin') }}</p><span>Manage your site from one place.</span></div>
+        <span class="admin-avatar">{{ session.get('admin_username', 'A')[:1]|upper }}</span>
+      </header>
+      <main class="admin-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flash-stack" aria-live="polite">
+              {% for category, message in messages %}
+                <p class="flash-message flash-{{ category }}">{{ message }}</p>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+    <script src="{{ url_for('static', filename='admin.js') }}"></script>
+  </body>
+</html>

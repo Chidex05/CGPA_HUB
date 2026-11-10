@@ -1,0 +1,30 @@
+{% extends "admin/base.html" %}
+{% block title %}{% if post.id %}Edit article{% else %}New article{% endif %}{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div><p class="eyebrow">BLOG MANAGEMENT</p><h1>{% if post.id %}Edit article{% else %}Write an article{% endif %}</h1><p>Save a draft now, or publish when it is ready.</p></div>
+  <a class="button button-quiet" href="{{ url_for('admin.posts') }}">← All articles</a>
+</section>
+<form class="panel admin-form editor-form" method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+  <div class="form-grid">
+    <div class="field-full"><label for="title">Article title</label><input id="title" name="title" maxlength="160" value="{{ post.title or '' }}" required /></div>
+    <div class="field-full"><label for="slug">URL slug <span class="field-hint">Leave blank to generate it from the title</span></label><input id="slug" name="slug" maxlength="100" value="{{ post.slug or '' }}" /></div>
+    <div><label for="category">Category</label><select id="category" name="category" required>
+      <option value="gpa" {% if post.category == 'gpa' %}selected{% endif %}>GPA guide</option>
+      <option value="study" {% if post.category == 'study' %}selected{% endif %}>Study tips</option>
+      <option value="grading" {% if post.category == 'grading' %}selected{% endif %}>Grading system</option>
+    </select></div>
+    <div><label for="read_time">Reading time (minutes)</label><input id="read_time" name="read_time" type="number" min="1" max="120" value="{{ post.read_time or 4 }}" required /></div>
+    <div class="field-full"><label for="excerpt">Short description <span class="field-hint">Up to 280 characters</span></label><textarea id="excerpt" name="excerpt" rows="3" maxlength="280" required>{{ post.excerpt or '' }}</textarea></div>
+    <div><label for="image">Cover image</label><select id="image" name="image" required>{% for image in images %}<option value="{{ image }}" {% if post.image == image %}selected{% endif %}>{{ image.split('/')[-1] }}</option>{% endfor %}</select></div>
+    <div><label for="image_alt">Image description</label><input id="image_alt" name="image_alt" maxlength="180" value="{{ post.image_alt or '' }}" required /></div>
+    <div class="field-full"><label for="body">Article content</label><textarea id="body" name="body" class="article-body-input" rows="16" required>{{ post.body or '' }}</textarea><span class="field-hint">Separate paragraphs with a blank line. Text is safely displayed as plain text.</span></div>
+  </div>
+  <div class="form-options">
+    <label class="check-field"><input type="checkbox" name="is_featured" value="1" {% if post.is_featured %}checked{% endif %} /> Feature this article on the blog</label>
+    <label class="check-field"><input type="checkbox" name="is_published" value="1" {% if post.is_published %}checked{% endif %} /> Publish this article</label>
+  </div>
+  <div class="form-actions"><a class="button button-quiet" href="{{ url_for('admin.posts') }}">Cancel</a><button class="button button-primary" type="submit">Save article</button></div>
+</form>
+{% endblock %}

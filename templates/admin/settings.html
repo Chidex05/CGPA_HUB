@@ -1,0 +1,17 @@
+{% extends "admin/base.html" %}
+{% block title %}Website settings{% endblock %}
+{% block content %}
+<section class="page-heading"><div><p class="eyebrow">MAKE IT YOURS</p><h1>Website settings</h1><p>Manage your public site name and branding.</p></div></section>
+<form class="panel admin-form settings-form" method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+  <div class="form-grid">
+    <div class="field-full"><label for="site_name">Website name</label><input id="site_name" name="site_name" maxlength="60" value="{{ content.site_name }}" required /></div>
+    <div class="field-full"><label for="site_tagline">Brand tagline</label><input id="site_tagline" name="site_tagline" maxlength="100" value="{{ content.site_tagline }}" /><span class="field-hint">Shown beneath the website name in the main navigation.</span></div>
+  </div>
+  <div class="form-actions"><button class="button button-primary" type="submit">Save settings</button></div>
+</form>
+<section class="panel security-panel">
+  <div class="panel-heading"><div><h2>Admin account</h2><p>Signed in as {{ session.get('admin_username') }}.</p></div></div>
+  <p>To change an admin password, run <code>flask --app app admin create-admin</code> from your project folder. Use a unique password of at least 12 characters.</p>
+</section>
+{% endblock %}
