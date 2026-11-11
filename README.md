@@ -20,20 +20,26 @@ no default password or public admin registration page.
 Without `DATABASE_URL`, the app uses local SQLite at
 `instance/cgpa_hub.sqlite3` and creates a local session key automatically.
 
-## Deploying on Vercel
+## Deploying with Supabase on Vercel
 
 The app is configured for Vercel's Flask runtime. Its build script copies
 `static/` assets into `public/static/`, where Vercel serves them from its CDN.
-For a Vercel deployment:
+The app connects to Supabase through PostgreSQL; it does not use Supabase
+Auth or the Supabase API keys.
 
-1. Add a managed PostgreSQL database to the Vercel project using the Vercel
-   Marketplace (for example, Neon). Configure its pooled connection string as
-   the `DATABASE_URL` environment variable for Production. Use a separate
-   database for Preview deployments so test edits cannot change production data.
-2. Add a strong, random `SECRET_KEY` and set `SESSION_COOKIE_SECURE=true` in
-   the Vercel Production environment variables. Redeploy after changing them.
-3. Deploy the branch containing these changes. The app creates its database
-   tables and starter content on first startup.
+1. Create a Supabase project. In its dashboard, open **Connect** and choose
+   the **Transaction pooler** connection string. Use the URI format and keep
+   its SSL option (`sslmode=require`). Replace the password placeholder with
+   your database password; URL-encode special characters in the password.
+2. In Vercel **Project Settings → Environment Variables**, add:
+   - `DATABASE_URL`: the complete Supabase transaction-pooler URI.
+   - `SECRET_KEY`: a strong, randomly generated secret.
+   - `SESSION_COOKIE_SECURE`: `true`.
+
+   Add them to Production. If you deploy Preview builds, use a separate
+   Supabase project for Preview and configure its own `DATABASE_URL` there.
+3. Deploy the project. On startup, the app creates its tables and starter
+   content in the Supabase database.
 4. Link this local project with `vercel link`, then create the production admin
    account from PowerShell:
 
@@ -44,11 +50,13 @@ For a Vercel deployment:
    The command prompts for the username and password without adding either to
    source control. Open `https://your-domain/admin` to sign in.
 
-Never commit database URLs, passwords, or session secrets. Admin accounts,
-content, and analytics are stored in PostgreSQL when `DATABASE_URL` is set;
-the Vercel filesystem is not used for persistent database storage. Data already
-saved in a local SQLite database is not copied automatically to PostgreSQL.
-Export or back up any local edits you need before switching production over.
+The app disables automatic prepared statements so it can use Supabase's
+transaction pooler reliably. Never commit database URLs, passwords, or session
+secrets. Admin accounts, content, and analytics are stored in Supabase when
+`DATABASE_URL` is set; the Vercel filesystem is not used for persistent
+database storage. Data already saved in a local SQLite database is not copied
+automatically to Supabase. Export or back up any local edits you need before
+switching production over.
 
 ## Admin workspace
 

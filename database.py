@@ -2,7 +2,6 @@ import os
 import re
 import sqlite3
 
-
 class DatabaseError(Exception):
     """Raised when a configured database operation fails."""
 
@@ -80,6 +79,7 @@ def connect_database(database_url=None, database_path=None):
             connection = psycopg.connect(
                 database_url,
                 row_factory=postgres_row_factory,
+                prepare_threshold=None,
             )
         except ImportError as error:
             raise RuntimeError(
