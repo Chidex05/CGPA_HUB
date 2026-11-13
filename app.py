@@ -1,10 +1,93 @@
+import logging
 import os
+import re
+import sys
+import uuid
 from datetime import date
 
-from flask import Flask, abort, render_template, request, jsonify
+from flask import Flask, abort, has_request_context, jsonify, render_template, request
+from werkzeug.exceptions import HTTPException
 from academic_engine import calculate_academic_record
 from admin import admin_bp, close_db, get_content, get_db, initialize_database
 from database import DatabaseError
+
+logger = logging.getLogger("cgpa_hub")
+logger.setLevel(logging.INFO)
+logger.propagate = False
+if not logger.handlers:
+    log_handler = logging.StreamHandler(sys.stderr)
+    log_handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
+    logger.addHandler(log_handler)
+
+_CONNECTION_URL_PATTERN = re.compile(
+    r"\b((?:postgres(?:ql)?|mysql|redis|mongodb(?:\+srv)?)://)[^\s\"'<>]+",
+    re.IGNORECASE,
+)
+_CREDENTIAL_PATTERN = re.compile(
+    r"""(?i)(["']?(?:password|passwd|secret|token|api[_-]?key|authorization|service[_-]?role[_-]?key)["']?\s*[:=]\s*)(?:"[^"]*"|'[^']*'|[^\s,;}\]]+)"""
+)
+_SENSITIVE_ENV_MARKERS = (
+    "SECRET",
+    "PASSWORD",
+    "PASSWD",
+    "TOKEN",
+    "KEY",
+    "CREDENTIAL",
+    "DATABASE_URL",
+    "AUTH",
+    "SUPABASE",
+)
+
+
+def _sanitize_log_text(value):
+    text = str(value)
+    text = _CREDENTIAL_PATTERN.sub(r"\1[REDACTED]", text)
+    text = _CONNECTION_URL_PATTERN.sub(r"\1[REDACTED]", text)
+    for name, secret in os.environ.items():
+        if secret and len(secret) >= 4 and any(
+            marker in name.upper() for marker in _SENSITIVE_ENV_MARKERS
+        ):
+            text = text.replace(secret, "[REDACTED]")
+    return text[:1000]
+
+
+def _log_sanitized_exception(error, context):
+    incident_id = uuid.uuid4().hex
+    exception_chain = []
+    seen_exceptions = set()
+    current = error
+    frames = []
+
+    while current is not None and id(current) not in seen_exceptions:
+        seen_exceptions.add(id(current))
+        exception_chain.append(
+            f"{type(current).__name__}: {_sanitize_log_text(current)}"
+        )
+        traceback = current.__traceback__
+        while traceback is not None and len(frames) < 40:
+            code = traceback.tb_frame.f_code
+            frames.append(
+                f"{os.path.basename(code.co_filename)}:{traceback.tb_lineno}:{code.co_name}"
+            )
+            traceback = traceback.tb_next
+        previous = current
+        current = previous.__cause__
+        if current is None and not previous.__suppress_context__:
+            current = previous.__context__
+
+    method = request.method if has_request_context() else "-"
+    endpoint = request.endpoint if has_request_context() else "-"
+    logger.error(
+        "incident_id=%s context=%s method=%s endpoint=%s exceptions=%s frames=%s",
+        incident_id,
+        context,
+        method,
+        endpoint,
+        " <- ".join(exception_chain),
+        ",".join(frames),
+    )
+    return incident_id
+
 
 app = Flask(__name__)
 app.config["SESSION_COOKIE_HTTPONLY"] = True
@@ -14,7 +97,25 @@ os.environ.get("SESSION_COOKIE_SECURE", "false").lower() == "true"
 )
 app.register_blueprint(admin_bp)
 app.teardown_appcontext(close_db)
-initialize_database(app)
+
+
+@app.errorhandler(Exception)
+def handle_unexpected_error(error):
+    if isinstance(error, HTTPException):
+        return error
+    incident_id = _log_sanitized_exception(error, context="request")
+    response = app.response_class("Internal Server Error", status=500, mimetype="text/plain")
+    response.headers["X-Error-ID"] = incident_id
+    return response
+
+
+try:
+    initialize_database(app)
+except Exception as error:
+    incident_id = _log_sanitized_exception(error, context="startup")
+    raise RuntimeError(
+        f"Application startup failed; see sanitized log incident {incident_id}."
+    ) from None
 
 @app.route('/')
 def home():
@@ -93,8 +194,8 @@ def record_public_pageview(response):
                 (date.today().isoformat(), request.path),
             )
             database.commit()
-        except DatabaseError:
-            app.logger.exception("Could not record an aggregated page view")
+        except DatabaseError as error:
+            _log_sanitized_exception(error, context="pageview")
     return response
 
 

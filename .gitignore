@@ -9,3 +9,5 @@ __pycache__/
 instance/
 public/static/
 templates - Shortcut.lnk
+.vercel
+.env*

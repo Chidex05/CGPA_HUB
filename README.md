@@ -50,6 +50,16 @@ Auth or the Supabase API keys.
    The command prompts for the username and password without adding either to
    source control. Open `https://your-domain/admin` to sign in.
 
+### Temporary Vercel error diagnostics
+
+The app temporarily writes sanitized startup and unhandled-request error details
+to standard error, which Vercel captures in function logs. Each entry includes
+an incident ID, exception type, redacted message, and source locations. Request
+failures return a generic 500 with the incident ID in the `X-Error-ID` response
+header. Request bodies, headers, query strings, and stack-frame locals are not
+logged. Remove the diagnostic logger, error handler, and startup logging wrapper
+from `app.py` after identifying and fixing the production error.
+
 The app disables automatic prepared statements so it can use Supabase's
 transaction pooler reliably. Never commit database URLs, passwords, or session
 secrets. Admin accounts, content, and analytics are stored in Supabase when
