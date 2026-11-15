@@ -20,26 +20,29 @@ no default password or public admin registration page.
 Without `DATABASE_URL`, the app uses local SQLite at
 `instance/cgpa_hub.sqlite3` and creates a local session key automatically.
 
-## Deploying with Supabase on Vercel
+## Deploying PostgreSQL on Vercel
 
 The app is configured for Vercel's Flask runtime. Its build script copies
 `static/` assets into `public/static/`, where Vercel serves them from its CDN.
-The app connects to Supabase through PostgreSQL; it does not use Supabase
-Auth or the Supabase API keys.
+The app connects to PostgreSQL through `psycopg`, so it can use Supabase,
+Neon, or another PostgreSQL provider. It does not require a provider-specific
+SDK or authentication API.
 
-1. Create a Supabase project. In its dashboard, open **Connect** and choose
-   the **Transaction pooler** connection string. Use the URI format and keep
-   its SSL option (`sslmode=require`). Replace the password placeholder with
-   your database password; URL-encode special characters in the password.
-2. In Vercel **Project Settings → Environment Variables**, add:
-   - `DATABASE_URL`: the complete Supabase transaction-pooler URI.
+1. Connect a managed PostgreSQL database to your Vercel project. For Neon, you
+   can use the Vercel Marketplace integration and its pooled connection string.
+   For Supabase, open **Connect** and choose the **Transaction pooler** URI;
+   keep `sslmode=require`. URL-encode special characters in the password.
+2. In Vercel **Project Settings → Environment Variables**, configure:
+   - `DATABASE_URL`: the complete pooled PostgreSQL connection URI.
    - `SECRET_KEY`: a strong, randomly generated secret.
    - `SESSION_COOKIE_SECURE`: `true`.
 
-   Add them to Production. If you deploy Preview builds, use a separate
-   Supabase project for Preview and configure its own `DATABASE_URL` there.
+   Set these for Production. If you deploy Preview builds, connect a separate
+   database or database branch and use its own `DATABASE_URL` so previews cannot
+   change production data.
 3. Deploy the project. On startup, the app creates its tables and starter
-   content in the Supabase database.
+   content. Initialization is serialized across concurrent PostgreSQL function
+   starts; local SQLite initialization also waits for concurrent writers.
 4. Link this local project with `vercel link`, then create the production admin
    account from PowerShell:
 
@@ -60,13 +63,13 @@ header. Request bodies, headers, query strings, and stack-frame locals are not
 logged. Remove the diagnostic logger, error handler, and startup logging wrapper
 from `app.py` after identifying and fixing the production error.
 
-The app disables automatic prepared statements so it can use Supabase's
-transaction pooler reliably. Never commit database URLs, passwords, or session
-secrets. Admin accounts, content, and analytics are stored in Supabase when
-`DATABASE_URL` is set; the Vercel filesystem is not used for persistent
-database storage. Data already saved in a local SQLite database is not copied
-automatically to Supabase. Export or back up any local edits you need before
-switching production over.
+The app disables Psycopg's automatic prepared statements for compatibility
+with transaction poolers, including Supabase's. Never commit database URLs,
+passwords, or session secrets. Admin accounts, content, and analytics are
+stored in PostgreSQL when `DATABASE_URL` is set; the Vercel filesystem is not
+used for persistent database storage. Data already saved in a local SQLite
+database is not copied automatically to PostgreSQL. Export or back up any
+local edits you need before switching production over.
 
 ## Admin workspace
 

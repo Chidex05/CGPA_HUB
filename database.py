@@ -92,7 +92,7 @@ def connect_database(database_url=None, database_path=None):
     if not database_path:
         raise RuntimeError("A local database path is required when DATABASE_URL is unset.")
     try:
-        connection = sqlite3.connect(database_path)
+        connection = sqlite3.connect(database_path, timeout=30.0)
     except sqlite3.Error as error:
         raise DatabaseError("Could not connect to the local SQLite database.") from error
     connection.row_factory = sqlite3.Row

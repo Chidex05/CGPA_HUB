@@ -118,6 +118,7 @@ def calculate_academic_record(courses, university="RSU"):
         semester_results.append({
             **record,
             "gpa": round(semester_gpa, 2)
+      
         })
 
     cgpa = total_points / total_units if total_units else 0

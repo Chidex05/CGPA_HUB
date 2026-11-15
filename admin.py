@@ -28,6 +28,7 @@ from database import connect_database
 
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
+POSTGRES_INIT_LOCK_KEY = 0x43475041485542
 
 DEFAULT_CONTENT = {
     "site_name": "CGPA Hub",
@@ -257,6 +258,14 @@ def initialize_database(app):
         app.config["DATABASE_URL"],
         app.config["ADMIN_DATABASE"],
     ) as database:
+        if database.is_postgres:
+            database.execute(
+                "SELECT pg_advisory_xact_lock(?)",
+                (POSTGRES_INIT_LOCK_KEY,),
+            )
+        else:
+            database.execute("BEGIN IMMEDIATE")
+
         for statement in schema:
             database.execute(statement)
         database.executemany(
@@ -278,6 +287,7 @@ def initialize_database(app):
                         title, slug, category, excerpt, body, image, image_alt,
                         read_time, is_featured, is_published
                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+                    ON CONFLICT (slug) DO NOTHING
                     """,
                     (
                         post["title"],
