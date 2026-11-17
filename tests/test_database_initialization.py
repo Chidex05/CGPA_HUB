@@ -41,6 +41,60 @@ class RecordingPostgresDatabase:
 
 
 class DatabaseInitializationTests(unittest.TestCase):
+    def test_calculator_url_aliases_return_public_pages(self):
+        import app as app_module
+
+        client = app_module.app.test_client()
+        for path in (
+            "/gpa",
+            "/gpa-calculator",
+            "/cgpa",
+            "/cgpa-calculator",
+            "/grade_predictor",
+            "/grade-predictor",
+        ):
+            response = client.get(path)
+            self.assertEqual(response.status_code, 200, path)
+            self.assertIn(b"<html", response.data.lower(), path)
+
+    def test_public_requests_increment_page_view_totals(self):
+        import app as app_module
+
+        with TemporaryDirectory() as directory:
+            app_module.app.config["TESTING"] = True
+            app_module.app.instance_path = directory
+            app_module.app.config["DATABASE_URL"] = ""
+            app_module.app.config["ADMIN_DATABASE"] = os.path.join(
+                directory,
+                "cgpa_hub.sqlite3",
+            )
+            app_module.app.config["UPLOAD_FOLDER"] = os.path.join(
+                directory,
+                "uploads",
+            )
+            app_module.app.config["SECRET_KEY"] = "page-view-test-secret"
+            admin.initialize_database(app_module.app)
+
+            client = app_module.app.test_client()
+            responses = [
+                client.get("/").status_code,
+                client.get("/").status_code,
+                client.get("/gpa-calculator").status_code,
+            ]
+
+            with app_module.app.app_context():
+                database = admin.get_db()
+                rows = {
+                    row["path"]: row["views"]
+                    for row in database.execute(
+                        "SELECT path, views FROM daily_pageviews"
+                    ).fetchall()
+                }
+
+        self.assertEqual(responses, [200, 200, 200])
+        self.assertEqual(rows["/"], 2)
+        self.assertEqual(rows["/gpa-calculator"], 1)
+
     def test_four_point_academic_record(self):
         result = academic_engine.calculate_academic_record(
             [

@@ -140,6 +140,7 @@ def home():
     return render_template('home.html', content=get_content())
 
 @app.route('/cgpa')
+@app.route('/cgpa-calculator')
 def cgpa():
     return render_template('cgpa.html')
 
@@ -184,6 +185,7 @@ def blog_article(slug):
 
 
 @app.route('/gpa-calculator')
+@app.route('/gpa')
 def gpa():
     return render_template('gpa.html')
 
@@ -192,6 +194,7 @@ def dashboard():
     return render_template('dashboard.html')
 
 @app.route('/grade_predictor')
+@app.route('/grade-predictor')
 def grade_predictor():
     return render_template('grade_predictor.html')
 
