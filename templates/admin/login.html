@@ -28,6 +28,7 @@
         <input id="username" name="username" type="text" autocomplete="username" required autofocus />
         <label for="password">Password</label>
         <input id="password" name="password" type="password" autocomplete="current-password" required />
+        <label class="check-field"><input type="checkbox" name="remember_me" value="1" /> Remember me for 30 days</label>
         <button class="button button-primary button-wide" type="submit">Sign in <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
       </form>
       <a class="back-to-site" href="{{ url_for('home') }}">← Back to CGPA Hub</a>

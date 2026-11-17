@@ -1,6 +1,30 @@
 import math
 
 UNIVERSITY_RULES = {
+    "4_POINT": {
+        "name": "4-point grading system",
+        "max_grade_point": 4,
+        "grades": {
+            "A": 4,
+            "B": 3,
+            "C": 2,
+            "D": 1,
+            "E": 0,
+            "F": 0
+        }
+    },
+    "5_POINT": {
+        "name": "5-point grading system",
+        "max_grade_point": 5,
+        "grades": {
+            "A": 5,
+            "B": 4,
+            "C": 3,
+            "D": 2,
+            "E": 1,
+            "F": 0
+        }
+    },
     "RSU": {
         "name": "Rivers State University",
         "max_grade_point": 5,
@@ -16,7 +40,16 @@ UNIVERSITY_RULES = {
 }
 
 def get_university_rules(university="RSU"):
-    rules = UNIVERSITY_RULES.get(university)
+    normalized = str(university).strip().upper().replace("-", "_").replace(" ", "_")
+    aliases = {
+        "4": "4_POINT",
+        "4_POINT": "4_POINT",
+        "FOUR": "4_POINT",
+        "5": "5_POINT",
+        "5_POINT": "5_POINT",
+        "FIVE": "5_POINT",
+    }
+    rules = UNIVERSITY_RULES.get(aliases.get(normalized, normalized))
 
     if not rules:
         raise ValueError("University grading system not supported.")

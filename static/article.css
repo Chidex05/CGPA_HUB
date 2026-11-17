@@ -67,6 +67,77 @@
   white-space: pre-line;
 }
 
+.article-video {
+  margin: 0 0 1.8rem;
+  overflow: hidden;
+  border: 1px solid rgba(192, 132, 252, 0.18);
+  border-radius: 14px;
+  background: #100a20;
+  aspect-ratio: 16 / 9;
+}
+
+.article-video iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.article-guidance-note {
+  margin: 1.2rem 0;
+  padding: 1rem 1.1rem;
+  border-left: 3px solid #a855f7;
+  border-radius: 0 10px 10px 0;
+  background: rgba(124, 58, 237, 0.1);
+  color: #c6bfd3;
+  font-size: 0.88rem;
+  line-height: 1.7;
+}
+
+.article-tool-links {
+  margin-top: 2rem;
+  padding: 1.4rem;
+  border: 1px solid rgba(192, 132, 252, 0.22);
+  border-radius: 14px;
+  background: rgba(41, 22, 69, 0.55);
+}
+
+.article-tool-links h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.article-tool-links p {
+  margin: 0.55rem 0 1rem;
+  color: #b6b1c6;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.article-tool-links > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+
+.article-tool-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid rgba(192, 132, 252, 0.25);
+  border-radius: 9px;
+  color: #e2c9ff;
+  font-size: 0.84rem;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.article-tool-links a:hover {
+  border-color: rgba(192, 132, 252, 0.6);
+  background: rgba(124, 58, 237, 0.16);
+  color: #fff;
+}
+
 .article-return {
   margin-top: 1.4rem;
   padding: 0.8rem 1rem;

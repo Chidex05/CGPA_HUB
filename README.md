@@ -17,6 +17,10 @@ the password is hidden while you type. Open `http://127.0.0.1:5000/admin` to
 sign in; this page is intentionally not linked from the public site. There is
 no default password or public admin registration page.
 
+The admin sign-in form's **Remember me for 30 days** option keeps the signed
+session cookie persistent for 30 days. Leave it unchecked to end the session
+when the browser closes. The password itself is never stored in the session.
+
 Without `DATABASE_URL`, the app uses local SQLite at
 `instance/cgpa_hub.sqlite3` and creates a local session key automatically.
 
@@ -77,13 +81,19 @@ The admin panel includes:
 
 - An overview of published articles, drafts, and page views.
 - Blog post creation, editing, featuring, draft/publish controls, and deletion.
-- Editable home-page and blog copy, site announcements, branding, and footer text.
+- Editable home-page and blog copy, site announcements, branding, footer text,
+  and the footer Bible verse and reference. Open **Website settings** in the
+  admin dashboard to edit the verse and reference or toggle its visibility.
 - 30-day page-view totals and popular pages.
 
-The first run seeds the blog with the existing six guides. Locally, posts and
-settings are stored in `instance/cgpa_hub.sqlite3`, which is intentionally
-excluded from Git. Back up this file to preserve local admin accounts, posts,
-settings, and analytics.
+The first run seeds the blog with six original guides and five student resource
+articles. Existing databases receive the five new articles once, without
+overwriting posts already in the CMS. The editor supports Academic Guides,
+CGPA Problem Solving, Student Corner, Study & Productivity, and CGPA Hub
+Updates categories, as well as an optional privacy-enhanced YouTube embed.
+Locally, posts and settings are stored in `instance/cgpa_hub.sqlite3`, which is
+intentionally excluded from Git. Back up this file to preserve local admin
+accounts, posts, settings, and analytics.
 
 Analytics are aggregate page counts only. The app does not store visitor names,
 accounts, IP addresses, or individual browsing histories.

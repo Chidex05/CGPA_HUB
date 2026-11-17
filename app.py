@@ -3,12 +3,21 @@ import os
 import re
 import sys
 import uuid
-from datetime import date
+from datetime import date, timedelta
 
 from flask import Flask, abort, has_request_context, jsonify, render_template, request
 from werkzeug.exceptions import HTTPException
 from academic_engine import calculate_academic_record
-from admin import admin_bp, close_db, get_content, get_db, initialize_database
+from admin import (
+    POST_CATEGORY_OPTIONS,
+    admin_bp,
+    category_filter_id,
+    category_label,
+    close_db,
+    get_content,
+    get_db,
+    initialize_database,
+)
 from database import DatabaseError
 
 logger = logging.getLogger("cgpa_hub")
@@ -92,6 +101,7 @@ def _log_sanitized_exception(error, context):
 app = Flask(__name__)
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=30)
 app.config["SESSION_COOKIE_SECURE"] = (
 os.environ.get("SESSION_COOKIE_SECURE", "false").lower() == "true"
 )
@@ -142,6 +152,9 @@ def blog():
         'blog.html',
         posts=posts,
         featured=featured,
+        category_options=POST_CATEGORY_OPTIONS,
+        category_filter_id=category_filter_id,
+        category_label=category_label,
         content=get_content(),
     )
 
@@ -154,7 +167,12 @@ def blog_article(slug):
     ).fetchone()
     if post is None:
         abort(404)
-    return render_template('article.html', post=post, content=get_content())
+    return render_template(
+        'article.html',
+        post=post,
+        category_label=category_label,
+        content=get_content(),
+    )
 
 
 @app.route('/gpa-calculator')
@@ -172,7 +190,13 @@ def grade_predictor():
 
 @app.context_processor
 def inject_current_year():
-    return {"now_year": date.today().year}
+    content = get_content()
+    return {
+        "now_year": date.today().year,
+        "footer_bible_verse": content["footer_bible_verse"],
+        "footer_bible_reference": content["footer_bible_reference"],
+        "show_footer_bible_verse": content["footer_bible_verse_visible"] == "1",
+    }
 
 
 @app.after_request
@@ -201,16 +225,13 @@ def record_public_pageview(response):
 
 @app.route('/calculate-gpa', methods=['POST'])
 def calculate_gpa():
-    grades = {
-        "A": 5,
-        "B": 4,
-        "C": 3,
-        "D": 2,
-        "E": 1,
-        "F": 0
-    }
-    
     data = request.get_json()
+    grading_system = str(data.get("grading_system", "5")).strip()
+    grades = (
+        {"A": 4, "B": 3, "C": 2, "D": 1, "E": 0, "F": 0}
+        if grading_system in {"4", "4-point", "4_point"}
+        else {"A": 5, "B": 4, "C": 3, "D": 2, "E": 1, "F": 0}
+    )
     total_units = 0
     total_gradepoints = 0
     
@@ -252,11 +273,12 @@ def calculate_cgpa():
     data = request.get_json(silent=True) or {}
     courses = data.get('courses', [])
     selected_session = str(data.get('selected_session', '')).strip()
+    grading_system = str(data.get('grading_system', '5')).strip()
 
     try:
         result = calculate_academic_record(
             courses,
-            university="RSU"
+            university=grading_system if grading_system in {"4", "5"} else "RSU"
         )
 
         semester_1_gpa = 0

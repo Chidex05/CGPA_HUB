@@ -20,6 +20,15 @@ const semesterSelect = document.getElementById("choose-semester");
 const courseCode = document.getElementById("course-code");
 const courseUnit = document.getElementById("course-unit");
 const gradeSelect = document.getElementById("grade");
+const gradingSystemSelect = document.getElementById("grading-system");
+
+if (gradingSystemSelect) {
+    const savedGradingSystem = localStorage.getItem("gradingSystem") || "5";
+    gradingSystemSelect.value = ["4", "5"].includes(savedGradingSystem) ? savedGradingSystem : "5";
+    gradingSystemSelect.addEventListener("change", () => {
+        localStorage.setItem("gradingSystem", gradingSystemSelect.value);
+    });
+}
 
 const addCourseBtn = document.getElementById("add-course");
 const calculateBtn = document.getElementById("calculate-gpabtn");
@@ -198,7 +207,11 @@ async function runCalculation() {
         const response = await fetch("/calculate-cgpa", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ courses: courses, selected_session: sessionSelect.value })
+            body: JSON.stringify({
+                courses: courses,
+                selected_session: sessionSelect.value,
+                grading_system: gradingSystemSelect ? gradingSystemSelect.value : "5"
+            })
         });
 
         const result = await response.json();

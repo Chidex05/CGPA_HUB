@@ -28,7 +28,7 @@
         <a class="article-back-link article-mobile-back" href="{{ url_for('blog') }}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> All articles</a>
         <div class="article-cover"><img src="{{ url_for('static', filename=post.image) }}" alt="{{ post.image_alt }}" /></div>
         <header class="article-header">
-          <p class="article-category">{% if post.category == "gpa" %}GPA guide{% elif post.category == "study" %}Study tips{% else %}Grading system{% endif %}</p>
+          <p class="article-category">{{ category_label(post.category) }}</p>
           <h1>{{ post.title }}</h1>
           <p class="article-excerpt">{{ post.excerpt }}</p>
           <div class="article-meta">
@@ -37,10 +37,34 @@
           </div>
         </header>
         <div class="article-body">{{ post.body }}</div>
+        {% if post.video_url %}
+        <section class="article-video" aria-label="Related video">
+          <iframe
+            src="{{ post.video_url }}"
+            title="Video for {{ post.title }}"
+            loading="lazy"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+          ></iframe>
+        </section>
+        {% endif %}
+        <aside class="article-guidance-note">
+          Academic rules can vary by institution. Check your current student handbook or ask an academic adviser before making decisions based on grading, repeat-course, or graduation policies.
+        </aside>
+        <section class="article-tool-links" aria-labelledby="article-tools-title">
+          <h2 id="article-tools-title">Put this guide into practice</h2>
+          <p>Use CGPA Hub's calculators to check your numbers and plan ahead.</p>
+          <div>
+            <a href="{{ url_for('gpa') }}">Open GPA calculator <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+            <a href="{{ url_for('cgpa') }}">Open CGPA calculator <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+          </div>
+        </section>
       </article>
       <a class="article-return" href="{{ url_for('blog') }}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to all articles</a>
     </main>
     <footer class="blog-footer">
+      {% include "footer_verse.html" %}
       <p>&copy; {{ now_year }} {{ content.site_name }}. {{ content.footer_text }}</p>
     </footer>
   </body>

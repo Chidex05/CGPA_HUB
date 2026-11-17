@@ -23,6 +23,25 @@
     font: 0.82rem sans-serif;
     text-align: center;
 }
+.footer-scripture {
+    width: min(760px, 92%);
+    margin: 1rem auto 0;
+    padding: 0.55rem 1rem;
+    text-align: center;
+}
+.footer-scripture-text {
+    margin: 0;
+    color: #b9d8ff;
+    font: italic 0.88rem/1.55 sans-serif;
+}
+.footer-scripture-reference {
+    margin-top: 0.28rem;
+    color: #8fb5e5;
+    font: 0.74rem/1.4 sans-serif;
+}
+.bible-verse-footer {
+    padding: 0.5rem 0 1rem;
+}
 .menu-toggle{
     display: none;
     background: transparent;

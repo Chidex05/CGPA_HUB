@@ -83,6 +83,15 @@
   <p>Select the academic session and semester to manage your courses</p>
  
   <div class="form-row">
+    <div class="form-group">
+      <label for="grading-system">Grading System</label>
+      <select id="grading-system">
+        <option value="5">5-point scale (A = 5)</option>
+        <option value="4">4-point scale (A = 4)</option>
+      </select>
+      <small>On the 4-point scale, E and F are 0 grade points.</small>
+    </div>
+
     <!-- Academic Session Dropdown -->
     <div class="form-group">
       <label for="choose-session">Academic Session</label>
@@ -212,7 +221,8 @@
  <footer class="quote">
    <p>
     "small steps every semester lead to big dreams"
-    
+     </p>
+   {% include "footer_verse.html" %}
   <p>@ 2026 CGPA Hub. Your Academic Success, Our Priority. </p>
  </footer>
     

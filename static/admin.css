@@ -580,6 +580,23 @@ td {
   max-width: 800px;
 }
 
+.settings-section-heading {
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--admin-border);
+}
+
+.settings-section-heading h2 {
+  margin: 0.9rem 0 0.35rem;
+  color: var(--admin-text);
+  font-size: 1rem;
+}
+
+.settings-section-heading p {
+  margin: 0;
+  color: var(--admin-muted);
+  font-size: 0.78rem;
+}
+
 .security-panel {
   max-width: 800px;
   margin-top: 1rem;

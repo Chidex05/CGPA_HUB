@@ -28,8 +28,31 @@ document.addEventListener("DOMContentLoaded", function() {
     const resultBox = document.getElementById("goal-result-box"); 
     const gpaDisplay = document.getElementById("required-gpa-display"); 
     const feedbackMsg = document.getElementById("goal-feedback-msg"); 
+    const gradingSystemSelect = document.getElementById("grading-system");
+    let gradingSystem = localStorage.getItem("gradingSystem") || "5";
+    if (gradingSystemSelect) {
+        gradingSystemSelect.value = ["4", "5"].includes(gradingSystem) ? gradingSystem : "5";
+        gradingSystem = gradingSystemSelect.value;
+        currentCGPAInput.max = gradingSystem;
+        targetCGPAInput.max = gradingSystem;
+        targetCGPAInput.placeholder = gradingSystem === "4" ? "e.g. 3.50" : "e.g. 4.50";
+        gradingSystemSelect.addEventListener("change", () => {
+            gradingSystem = gradingSystemSelect.value;
+            localStorage.setItem("gradingSystem", gradingSystem);
+            const maximum = Number(gradingSystem);
+            pointsMap = gradingSystem === "4"
+                ? { "A": 4, "B": 3, "C": 2, "D": 1, "E": 0, "F": 0 }
+                : { "A": 5, "B": 4, "C": 3, "D": 2, "E": 1, "F": 0 };
+            currentCGPAInput.max = String(maximum);
+            targetCGPAInput.max = String(maximum);
+            targetCGPAInput.placeholder = gradingSystem === "4" ? "e.g. 3.50" : "e.g. 4.50";
+            loadAcademicRecord();
+        });
+    }
 
-    const pointsMap = { "A": 5, "B": 4, "C": 3, "D": 2, "E": 1, "F": 0 };
+    let pointsMap = gradingSystem === "4"
+        ? { "A": 4, "B": 3, "C": 2, "D": 1, "E": 0, "F": 0 }
+        : { "A": 5, "B": 4, "C": 3, "D": 2, "E": 1, "F": 0 };
 
     function getAcademicrecord() { 
         const savedCourses = JSON.parse(localStorage.getItem("cgpaCourses")) || []; 
@@ -70,8 +93,9 @@ document.addEventListener("DOMContentLoaded", function() {
             alert("Please calculate your current CGPA first by adding your courses and grades."); 
             return; 
         } 
-        if (targetCGPAInput.value === "" || !Number.isFinite(targetCGPA) || targetCGPA <= 0 || targetCGPA > 5) { 
-            alert("Please enter a valid target CGPA between 0.00 and 5.00."); 
+        const maximum = gradingSystem === "4" ? 4 : 5;
+        if (targetCGPAInput.value === "" || !Number.isFinite(targetCGPA) || targetCGPA <= 0 || targetCGPA > maximum) { 
+            alert(`Please enter a valid target CGPA between 0.00 and ${maximum.toFixed(2)}.`);
             return; 
         } 
         if (nextSemesterUnitsInput.value === "" || !Number.isInteger(nextSemesterUnits) || nextSemesterUnits <= 0) { 
@@ -90,10 +114,10 @@ document.addEventListener("DOMContentLoaded", function() {
         if (requiredGPA <= currentCGPA) {
             gpaDisplay.style.color = "#10b981"; // Green
             feedbackMsg.textContent = "You are already on track or above this target! Maintain your performance.";
-        } else if (requiredGPA > 5.0) { 
+        } else if (requiredGPA > maximum) { 
             gpaDisplay.style.color = "#ef4444"; // Red 
             feedbackMsg.textContent = "Mathematically impossible next semester. Lower your target or add more units."; 
-        } else if (requiredGPA > 4.5) { 
+        } else if (requiredGPA > (gradingSystem === "4" ? 3.5 : 4.5)) { 
             gpaDisplay.style.color = "#f97316"; // Orange 
             feedbackMsg.textContent = "Extremely high target! You will need straight A's next semester."; 
         } else { 

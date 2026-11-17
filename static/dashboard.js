@@ -27,7 +27,10 @@ function runDashboardEngine() {
     const totalCoursesCount = savedCourses.length;
 
     // Grade Weight Evaluation Schema
-    const pointsMap = { "A": 5, "B": 4, "C": 3, "D": 2, "E": 1, "F": 0 };
+    const gradingSystem = localStorage.getItem("gradingSystem") || "5";
+    const pointsMap = gradingSystem === "4"
+        ? { "A": 4, "B": 3, "C": 2, "D": 1, "E": 0, "F": 0 }
+        : { "A": 5, "B": 4, "C": 3, "D": 2, "E": 1, "F": 0 };
 
     // 2. Compute aggregate values
     savedCourses.forEach(course => {
@@ -45,13 +48,22 @@ function runDashboardEngine() {
     // 4. Update the metric text values on the page layout cards
     document.getElementById("dash-cgpa").textContent = computedCGPA.toFixed(2);
     document.getElementById("dash-units").textContent = totalUnits;
+    const targetGoal = document.getElementById("target-gpa-default");
+    if (targetGoal) targetGoal.textContent = gradingSystem === "4" ? "3.50" : "4.50";
 
     // Determine Degree Honors Ranking Tier Classifications
     let tierText = "Pass";
-    if (computedCGPA >= 4.50) tierText = "First Class";
-    else if (computedCGPA >= 3.50) tierText = "2nd Class Upper";
-    else if (computedCGPA >= 2.40) tierText = "2nd Class Lower";
-    else if (computedCGPA >= 1.50) tierText = "Third Class";
+    if (gradingSystem === "4") {
+        if (computedCGPA >= 3.50) tierText = "First Class";
+        else if (computedCGPA >= 3.00) tierText = "Second Class Upper";
+        else if (computedCGPA >= 2.00) tierText = "Second Class Lower";
+        else if (computedCGPA >= 1.00) tierText = "Third Class";
+    } else {
+        if (computedCGPA >= 4.50) tierText = "First Class";
+        else if (computedCGPA >= 3.50) tierText = "2nd Class Upper";
+        else if (computedCGPA >= 2.40) tierText = "2nd Class Lower";
+        else if (computedCGPA >= 1.50) tierText = "Third Class";
+    }
     if (totalCoursesCount === 0) tierText = "No Data Yet";
 
     document.getElementById("dash-standing").textContent = tierText;
@@ -61,7 +73,10 @@ function runDashboardEngine() {
     if (messageNode) {
         if (totalCoursesCount === 0) {
             messageNode.innerHTML = `<i class="fa-solid fa-lightbulb text-yellow"></i> Welcome! Your dashboard is active. Head over to the calculator page to add modules and compute your first term scores.`;
-        } else if (computedCGPA >= 4.50) {
+        } else if (
+            (gradingSystem === "4" && computedCGPA >= 3.50) ||
+            (gradingSystem === "5" && computedCGPA >= 4.50)
+        ) {
             messageNode.innerHTML = `<i class="fa-solid fa-circle-check" style="color: #10b981;"></i> Excellent academic standing! Maintain your momentum to graduate with a <strong>First Class</strong> distinction.`;
         } else {
             messageNode.innerHTML = `<i class="fa-solid fa-arrow-trend-up" style="color: #3b82f6;"></i> Profile tracking updated. Your overall average is currently sitting at a <strong>${computedCGPA.toFixed(2)}</strong> index.`;

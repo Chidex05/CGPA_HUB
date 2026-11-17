@@ -11,14 +11,15 @@
     <div class="field-full"><label for="title">Article title</label><input id="title" name="title" maxlength="160" value="{{ post.title or '' }}" required /></div>
     <div class="field-full"><label for="slug">URL slug <span class="field-hint">Leave blank to generate it from the title</span></label><input id="slug" name="slug" maxlength="100" value="{{ post.slug or '' }}" /></div>
     <div><label for="category">Category</label><select id="category" name="category" required>
-      <option value="gpa" {% if post.category == 'gpa' %}selected{% endif %}>GPA guide</option>
-      <option value="study" {% if post.category == 'study' %}selected{% endif %}>Study tips</option>
-      <option value="grading" {% if post.category == 'grading' %}selected{% endif %}>Grading system</option>
+      {% for category_id, label in category_options %}
+      <option value="{{ category_id }}" {% if category_filter_id(post.category) == category_id %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
     </select></div>
     <div><label for="read_time">Reading time (minutes)</label><input id="read_time" name="read_time" type="number" min="1" max="120" value="{{ post.read_time or 4 }}" required /></div>
     <div class="field-full"><label for="excerpt">Short description <span class="field-hint">Up to 280 characters</span></label><textarea id="excerpt" name="excerpt" rows="3" maxlength="280" required>{{ post.excerpt or '' }}</textarea></div>
     <div><label for="image">Cover image</label><select id="image" name="image" required>{% for image in images %}<option value="{{ image }}" {% if post.image == image %}selected{% endif %}>{{ image.split('/')[-1] }}</option>{% endfor %}</select></div>
     <div><label for="image_alt">Image description</label><input id="image_alt" name="image_alt" maxlength="180" value="{{ post.image_alt or '' }}" required /></div>
+    <div class="field-full"><label for="video_url">Related YouTube video <span class="field-hint">Optional. Paste a YouTube watch, youtu.be, Shorts, or embed link.</span></label><input id="video_url" name="video_url" type="url" maxlength="500" value="{{ post.video_url or '' }}" placeholder="https://www.youtube.com/watch?v=..." /></div>
     <div class="field-full"><label for="body">Article content</label><textarea id="body" name="body" class="article-body-input" rows="16" required>{{ post.body or '' }}</textarea><span class="field-hint">Separate paragraphs with a blank line. Text is safely displayed as plain text.</span></div>
   </div>
   <div class="form-options">

@@ -7,6 +7,8 @@ const emptyState = document.getElementById("empty-state");
 let activeFilter = "all";
 
 function updateArticles() {
+  if (!articleSearch || !articleCount || !emptyState) return;
+  const articleCards = Array.from(document.querySelectorAll(".article-card"));
   const query = articleSearch.value.trim().toLocaleLowerCase();
   let visibleCount = 0;
 
@@ -26,7 +28,7 @@ function updateArticles() {
 
 filterButtons.forEach((button) => {
   button.addEventListener("click", () => {
-    activeFilter = button.dataset.filter;
+    activeFilter = button.dataset.filter || "all";
     filterButtons.forEach((filterButton) => {
       const isActive = filterButton === button;
       filterButton.classList.toggle("is-active", isActive);
@@ -36,14 +38,19 @@ filterButtons.forEach((button) => {
   });
 });
 
-articleSearch.addEventListener("input", updateArticles);
+if (articleSearch) {
+  articleSearch.addEventListener("input", updateArticles);
+}
+document.addEventListener("cgpa-hub:posts-updated", updateArticles);
 
 document.addEventListener("keydown", (event) => {
   if (
+    articleSearch &&
     event.key === "/" &&
     !event.ctrlKey &&
     !event.metaKey &&
     !event.altKey &&
+    document.activeElement &&
     !["INPUT", "TEXTAREA"].includes(document.activeElement.tagName)
   ) {
     event.preventDefault();

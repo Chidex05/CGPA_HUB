@@ -1,14 +1,20 @@
 {% extends "admin/base.html" %}
 {% block title %}Website settings{% endblock %}
 {% block content %}
-<section class="page-heading"><div><p class="eyebrow">MAKE IT YOURS</p><h1>Website settings</h1><p>Manage your public site name and branding.</p></div></section>
+<section class="page-heading"><div><p class="eyebrow">MAKE IT YOURS</p><h1>Website settings</h1><p>Manage your public site branding and footer Bible verse.</p></div></section>
 <form class="panel admin-form settings-form" method="post">
   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
   <div class="form-grid">
     <div class="field-full"><label for="site_name">Website name</label><input id="site_name" name="site_name" maxlength="60" value="{{ content.site_name }}" required /></div>
     <div class="field-full"><label for="site_tagline">Brand tagline</label><input id="site_tagline" name="site_tagline" maxlength="100" value="{{ content.site_tagline }}" /><span class="field-hint">Shown beneath the website name in the main navigation.</span></div>
+    <div class="field-full settings-section-heading"><h2>Footer Bible verse</h2><p>Choose the verse and reference shown on public pages.</p></div>
+    <div class="field-full"><label for="footer_bible_verse">Verse text</label><textarea id="footer_bible_verse" name="footer_bible_verse" rows="3" maxlength="1000">{{ content.footer_bible_verse }}</textarea></div>
+    <div class="field-full"><label for="footer_bible_reference">Verse reference</label><input id="footer_bible_reference" name="footer_bible_reference" maxlength="100" value="{{ content.footer_bible_reference }}" placeholder="e.g. Proverbs 16:3 (KJV)" /></div>
   </div>
-  <div class="form-actions"><button class="button button-primary" type="submit">Save settings</button></div>
+  <div class="form-options">
+    <label class="check-field"><input type="checkbox" name="footer_bible_verse_visible" value="1" {% if content.footer_bible_verse_visible == "1" %}checked{% endif %} /> Show Bible verse in the public footer</label>
+  </div>
+  <div class="form-actions"><button class="button button-primary" type="submit">Save Changes</button></div>
 </form>
 <section class="panel security-panel">
   <div class="panel-heading"><div><h2>Admin account</h2><p>Signed in as {{ session.get('admin_username') }}.</p></div></div>

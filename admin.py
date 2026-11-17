@@ -7,7 +7,7 @@ import unicodedata
 from datetime import date, timedelta
 from functools import wraps
 from pathlib import Path
-from urllib.parse import urlsplit
+from urllib.parse import parse_qs, urlsplit
 
 import click
 from flask import (
@@ -39,12 +39,66 @@ DEFAULT_CONTENT = {
         "and access helpful academic resources."
     ),
     "blog_intro": (
-        "Straightforward guides, study strategies, and practical advice to help "
-        "you feel more confident about your academics."
+        "Understand your grades, solve common CGPA questions, and find practical "
+        "ways to plan your next semester."
     ),
     "announcement": "",
     "footer_text": "Your academic success, our priority.",
+    "footer_bible_verse": (
+        "Commit thy works unto the LORD, and thy thoughts shall be established."
+    ),
+    "footer_bible_reference": "Proverbs 16:3 (KJV)",
+    "footer_bible_verse_visible": "1",
 }
+
+POST_CATEGORY_OPTIONS = (
+    ("academic", "Academic Guides"),
+    ("problem-solving", "CGPA Problem Solving"),
+    ("student-corner", "Student Corner"),
+    ("study", "Study & Productivity"),
+    ("updates", "CGPA Hub Updates"),
+)
+CATEGORY_LABELS = dict(POST_CATEGORY_OPTIONS)
+LEGACY_CATEGORY_IDS = {"gpa": "academic", "grading": "academic"}
+
+
+def category_filter_id(category):
+    return LEGACY_CATEGORY_IDS.get(category, category)
+
+
+def category_label(category):
+    return CATEGORY_LABELS.get(category_filter_id(category), "Academic Guides")
+
+
+def normalize_youtube_url(value):
+    value = value.strip()
+    if not value:
+        return ""
+    try:
+        parsed = urlsplit(value)
+        if parsed.scheme != "https" or parsed.username or parsed.password:
+            return None
+        if parsed.port not in (None, 443):
+            return None
+    except ValueError:
+        return None
+
+    host = (parsed.hostname or "").lower()
+    video_id = ""
+    if host == "youtu.be":
+        video_id = parsed.path.strip("/").split("/", 1)[0]
+    elif host in {"youtube.com", "www.youtube.com", "m.youtube.com"}:
+        if parsed.path == "/watch":
+            video_id = parse_qs(parsed.query).get("v", [""])[0]
+        else:
+            path_parts = parsed.path.strip("/").split("/")
+            if len(path_parts) == 2 and path_parts[0] in {"embed", "shorts", "live"}:
+                video_id = path_parts[1]
+
+    if not re.fullmatch(r"[A-Za-z0-9_-]{11}", video_id):
+        return None
+    return f"https://www.youtube-nocookie.com/embed/{video_id}"
+
 
 SEED_POSTS = [
     {
@@ -165,6 +219,164 @@ SEED_POSTS = [
     },
 ]
 
+STARTER_POSTS = [
+    {
+        "title": "Understanding the 4-Point Grading System",
+        "category": "academic",
+        "excerpt": "Learn the common A-to-F grade values used by 4-point GPA and CGPA systems, and when to confirm institution-specific rules.",
+        "image": "ce469c725d7ecb03f059d7569411f664.jpg",
+        "alt": "Notes and books for reviewing a four-point grading scale",
+        "read_time": 4,
+        "body": (
+            "A 4-point grading system assigns grade points on a scale with A "
+            "equal to 4 and F equal to 0. A common letter-grade mapping is "
+            "A = 4, B = 3, C = 2, D = 1, and E or F = 0. Multiply each "
+            "grade point by the course units and divide the total quality "
+            "points by total units to calculate GPA or CGPA.\n\n"
+            "Worked example: 3 units with an A contribute 12 quality points, "
+            "2 units with a B contribute 6, and 3 units with a C contribute "
+            "6. Across 8 units, the GPA is (12 + 6 + 6) / 8 = 3.00.\n\n"
+            "Do not assume every school uses the same scale or degree "
+            "classification cutoffs. Some universities use different meanings "
+            "for D or E, different repeat-course rules, or their own honours "
+            "class boundaries. Always confirm the official grading policy in "
+            "your institution's handbook."
+        ),
+    },
+    {
+        "title": "Understanding GPA vs CGPA: What's the Difference?",
+        "category": "academic",
+        "excerpt": "Learn what GPA and CGPA measure, how they relate, and why course units matter when comparing them.",
+        "image": "5e613082b1f41a852a07ad23017508af.jpg",
+        "alt": "Books arranged for a university study session",
+        "read_time": 4,
+        "body": (
+            "GPA (Grade Point Average) summarizes your results for a particular "
+            "semester. CGPA (Cumulative Grade Point Average) summarizes the "
+            "results counted across multiple semesters. They use related "
+            "information, but they answer different questions: GPA shows how "
+            "one semester went, while CGPA shows your cumulative record.\n\n"
+            "Both calculations usually multiply each course's grade point by "
+            "its credit units, add those quality points, then divide by the "
+            "total credit units included. Because units carry different "
+            "weights, CGPA is not necessarily the simple average of semester "
+            "GPAs. The exact calculation can also depend on your institution's "
+            "rules for repeats, withdrawals, and excluded courses.\n\n"
+            "Example: if two semesters have the same total units, their GPA "
+            "values contribute equally to the combined CGPA. If one semester "
+            "has more counted units, it contributes more. For an accurate "
+            "result, use the units and grades on your transcript and confirm "
+            "which attempts your school includes."
+        ),
+    },
+    {
+        "title": "How to Calculate Your CGPA Using Course Units",
+        "category": "academic",
+        "excerpt": "Follow a course-by-course example to see how grade points and units combine into a weighted average.",
+        "image": "522099927e2af7a76ab1ca67a52b3ccd.jpg",
+        "alt": "Study materials for working out a CGPA",
+        "read_time": 5,
+        "body": (
+            "A common way to calculate CGPA is to divide total quality points "
+            "by the total credit units counted. For each course, multiply its "
+            "grade point by its course units to get quality points. Add the "
+            "quality points for all included courses, then divide by their "
+            "combined units.\n\n"
+            "Worked example on a five-point scale: imagine four courses. You "
+            "earn 5 points in a 3-unit course, 4 points in a 2-unit course, "
+            "3 points in another 3-unit course, and 2 points in a 2-unit "
+            "course. Their quality points are 15, 8, 9, and 4. The total is "
+            "36 quality points over 10 units, so the weighted average is "
+            "36 / 10 = 3.60.\n\n"
+            "For a cumulative result, include all courses and attempts that "
+            "your institution counts, not just the current semester. Use the "
+            "grade-point scale in your handbook; grade boundaries and repeat "
+            "rules can differ between schools. Keep full precision while "
+            "adding, and round only the final result according to your "
+            "institution's convention."
+        ),
+    },
+    {
+        "title": "How to Improve Your CGPA in the Next Semester",
+        "category": "study",
+        "excerpt": "Build a realistic semester plan around course priorities, steady revision, feedback, and support.",
+        "image": "6e92d5436836fc828a79e51f2e63ccf7.jpg",
+        "alt": "A calm place to focus and study",
+        "read_time": 5,
+        "body": (
+            "Start with a clear picture of where you are. Review your results "
+            "and course feedback, identify topics that caused difficulty, and "
+            "note important deadlines for the coming semester. If you have a "
+            "target CGPA, calculate what is realistic using your completed "
+            "units and planned workload rather than relying on guesswork.\n\n"
+            "Give every course regular attention. Make a weekly timetable "
+            "that includes lectures, short review sessions, assignment time, "
+            "and breaks. Practise active recall by answering questions "
+            "without looking at your notes, then use the gaps you find to "
+            "guide your next study session. Begin major assignments and exam "
+            "revision early enough to ask for help.\n\n"
+            "Check your progress during the semester, not only after results "
+            "are released. Ask lecturers, tutors, classmates, or academic "
+            "advisers for support when you need it. Consistent habits can "
+            "improve your preparation, but no study plan can guarantee a "
+            "particular grade or result."
+        ),
+    },
+    {
+        "title": "What GPA Do You Need to Reach Your Desired CGPA?",
+        "category": "problem-solving",
+        "excerpt": "Use a weighted-average formula and worked example to estimate the GPA needed over your next courses.",
+        "image": "5b9cc83932aee09221b56e8e01dcb86d.jpg",
+        "alt": "Textbooks ready for another semester",
+        "read_time": 5,
+        "body": (
+            "You can estimate the GPA needed in upcoming courses if you know "
+            "your current CGPA, completed units, desired CGPA, and planned "
+            "units. When all of those units count under the same rules, use:\n\n"
+            "Required GPA = (desired CGPA x (completed units + planned units) "
+            "- current CGPA x completed units) / planned units.\n\n"
+            "Worked example: your current CGPA is 3.20 over 60 units, and you "
+            "want a 3.50 CGPA after taking 20 more units. The calculation is "
+            "(3.50 x 80 - 3.20 x 60) / 20 = (280 - 192) / 20 = 4.40. You "
+            "would need a 4.40 GPA across those 20 units to reach that "
+            "estimated target.\n\n"
+            "Compare the required GPA with the highest possible GPA on your "
+            "scale. If it is above the maximum, the target cannot be reached "
+            "in that number of units; consider a longer timeline or another "
+            "target. This estimate assumes a straightforward unit-weighted "
+            "average. Repeated courses, exclusions, or special rounding "
+            "policies can change the result, so check your school's rules. "
+            "Use the CGPA calculator to explore your own numbers."
+        ),
+    },
+    {
+        "title": "Five Common Mistakes Students Make When Calculating CGPA",
+        "category": "student-corner",
+        "excerpt": "Avoid common calculation errors involving course units, grade scales, semester averages, repeats, and rounding.",
+        "image": "ce469c725d7ecb03f059d7569411f664.jpg",
+        "alt": "Notes and books for reviewing university grades",
+        "read_time": 4,
+        "body": (
+            "1. Taking a simple average of course grades. Courses often have "
+            "different units, so multiply each grade point by its units "
+            "before combining results.\n\n"
+            "2. Averaging semester GPAs without checking their unit totals. "
+            "A semester with more counted units usually has more influence "
+            "on a cumulative weighted average.\n\n"
+            "3. Using the wrong grade-point scale. Confirm the scale and "
+            "grade boundaries published by your own institution instead of "
+            "copying another school's table.\n\n"
+            "4. Guessing how a repeated course is counted. Some institutions "
+            "replace an earlier grade; others use different rules. Check "
+            "your current handbook or ask an academic adviser.\n\n"
+            "5. Rounding too early or including the wrong courses. Keep "
+            "precision during intermediate steps, and verify which courses "
+            "and attempts belong in the calculation. Round only the final "
+            "answer as your institution requires."
+        ),
+    },
+]
+
 
 def get_db():
     if "admin_db" not in g:
@@ -225,6 +437,7 @@ def initialize_database(app):
                 image TEXT NOT NULL,
                 image_alt TEXT NOT NULL,
                 read_time INTEGER NOT NULL,
+                video_url TEXT NOT NULL DEFAULT '',
                 is_featured INTEGER NOT NULL DEFAULT 0,
                 is_published INTEGER NOT NULL DEFAULT 0,
                 created_at TEXT NOT NULL DEFAULT {timestamp_default},
@@ -268,6 +481,14 @@ def initialize_database(app):
 
         for statement in schema:
             database.execute(statement)
+        post_columns = {
+            column.name if hasattr(column, "name") else column[0]
+            for column in database.execute("SELECT * FROM posts LIMIT 0").description or ()
+        }
+        if "video_url" not in post_columns:
+            database.execute(
+                "ALTER TABLE posts ADD COLUMN video_url TEXT NOT NULL DEFAULT ''"
+            )
         database.executemany(
             """
             INSERT INTO site_content (key, value) VALUES (?, ?)
@@ -278,29 +499,29 @@ def initialize_database(app):
         post_count = database.execute(
             "SELECT COUNT(*) AS count FROM posts"
         ).fetchone()["count"]
-        if post_count == 0:
-            for post in SEED_POSTS:
-                slug = slugify(post["title"])
-                database.execute(
-                    """
-                    INSERT INTO posts (
-                        title, slug, category, excerpt, body, image, image_alt,
-                        read_time, is_featured, is_published
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
-                    ON CONFLICT (slug) DO NOTHING
-                    """,
-                    (
-                        post["title"],
-                        slug,
-                        post["category"],
-                        post["excerpt"],
-                        post["body"],
-                        f"Images/{post['image']}",
-                        post["alt"],
-                        post["read_time"],
-                        int(post["category"] == "gpa" and slug == "how-to-calculate-your-gpa"),
-                    ),
-                )
+        posts_to_seed = (SEED_POSTS if post_count == 0 else []) + STARTER_POSTS
+        for post in posts_to_seed:
+            slug = slugify(post["title"])
+            database.execute(
+                """
+                INSERT INTO posts (
+                    title, slug, category, excerpt, body, image, image_alt,
+                    read_time, video_url, is_featured, is_published
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, '', ?, 1)
+                ON CONFLICT (slug) DO NOTHING
+                """,
+                (
+                    post["title"],
+                    slug,
+                    post["category"],
+                    post["excerpt"],
+                    post["body"],
+                    f"Images/{post['image']}",
+                    post["alt"],
+                    post["read_time"],
+                    int(post["category"] == "gpa" and slug == "how-to-calculate-your-gpa"),
+                ),
+            )
         if not os.environ.get("SECRET_KEY"):
             database.execute(
                 """
@@ -386,6 +607,7 @@ def validate_post_form():
     body = request.form.get("body", "").strip()
     image = request.form.get("image", "").strip()
     image_alt = request.form.get("image_alt", "").strip()
+    video_url = normalize_youtube_url(request.form.get("video_url", ""))
     try:
         read_time = int(request.form.get("read_time", ""))
     except ValueError:
@@ -397,8 +619,10 @@ def validate_post_form():
         errors.append("Enter a title between 1 and 160 characters.")
     if not slugify(slug_source):
         errors.append("The URL slug must contain at least one letter or number.")
-    if category not in {"gpa", "study", "grading"}:
+    if category not in CATEGORY_LABELS:
         errors.append("Choose a valid article category.")
+    if video_url is None:
+        errors.append("Enter a valid YouTube video link or leave the field blank.")
     if not excerpt or len(excerpt) > 280:
         errors.append("Enter an excerpt between 1 and 280 characters.")
     if not body:
@@ -422,6 +646,7 @@ def validate_post_form():
         "body": body,
         "image": image,
         "image_alt": image_alt,
+        "video_url": video_url,
         "read_time": read_time,
         "is_featured": int(request.form.get("is_featured") == "1"),
         "is_published": int(request.form.get("is_published") == "1"),
@@ -499,6 +724,7 @@ def login():
             database.execute("DELETE FROM login_attempts WHERE key_hash = ?", (attempt_key,))
             database.commit()
             session.clear()
+            session.permanent = request.form.get("remember_me") == "1"
             session["admin_id"] = account["id"]
             session["admin_username"] = account["username"]
             destination = request.args.get("next", "")
@@ -616,7 +842,12 @@ def posts():
     post_list = get_db().execute(
         "SELECT * FROM posts ORDER BY is_published, updated_at DESC"
     ).fetchall()
-    return render_template("admin/posts.html", posts=post_list, content=get_content())
+    return render_template(
+        "admin/posts.html",
+        posts=post_list,
+        category_label=category_label,
+        content=get_content(),
+    )
 
 
 @admin_bp.route("/posts/new", methods=["GET", "POST"])
@@ -637,12 +868,12 @@ def new_post():
                 """
                 INSERT INTO posts (
                     title, slug, category, excerpt, body, image, image_alt,
-                    read_time, is_featured, is_published, updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+                    read_time, video_url, is_featured, is_published, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
                 """,
                 tuple(post[key] for key in (
                     "title", "slug", "category", "excerpt", "body", "image",
-                    "image_alt", "read_time", "is_featured", "is_published",
+                    "image_alt", "read_time", "video_url", "is_featured", "is_published",
                 )),
             )
             database.commit()
@@ -655,6 +886,8 @@ def new_post():
         "admin/post_form.html",
         post=form_data,
         images=available_images(),
+        category_options=POST_CATEGORY_OPTIONS,
+        category_filter_id=category_filter_id,
         content=get_content(),
     )
 
@@ -680,13 +913,13 @@ def edit_post(post_id):
                 """
                 UPDATE posts SET
                     title = ?, slug = ?, category = ?, excerpt = ?, body = ?,
-                    image = ?, image_alt = ?, read_time = ?, is_featured = ?,
+                    image = ?, image_alt = ?, read_time = ?, video_url = ?, is_featured = ?,
                     is_published = ?, updated_at = CURRENT_TIMESTAMP
                 WHERE id = ?
                 """,
                 tuple(post[key] for key in (
                     "title", "slug", "category", "excerpt", "body", "image",
-                    "image_alt", "read_time", "is_featured", "is_published",
+                    "image_alt", "read_time", "video_url", "is_featured", "is_published",
                 )) + (post_id,),
             )
             database.commit()
@@ -699,6 +932,8 @@ def edit_post(post_id):
         "admin/post_form.html",
         post=form_data,
         images=available_images(),
+        category_options=POST_CATEGORY_OPTIONS,
+        category_filter_id=category_filter_id,
         content=get_content(),
     )
 
@@ -766,11 +1001,33 @@ def settings():
         updated = {
             "site_name": request.form.get("site_name", "").strip(),
             "site_tagline": request.form.get("site_tagline", "").strip(),
+            "footer_bible_verse": request.form.get("footer_bible_verse", "").strip(),
+            "footer_bible_reference": request.form.get(
+                "footer_bible_reference", ""
+            ).strip(),
+            "footer_bible_verse_visible": (
+                "1" if request.form.get("footer_bible_verse_visible") == "1" else "0"
+            ),
         }
+        errors = []
         if not updated["site_name"] or len(updated["site_name"]) > 60:
-            flash("Site name must be between 1 and 60 characters.", "error")
-        elif len(updated["site_tagline"]) > 100:
-            flash("Site tagline must be 100 characters or fewer.", "error")
+            errors.append("Site name must be between 1 and 60 characters.")
+        if len(updated["site_tagline"]) > 100:
+            errors.append("Site tagline must be 100 characters or fewer.")
+        if len(updated["footer_bible_verse"]) > 1000:
+            errors.append("Bible verse must be 1,000 characters or fewer.")
+        if len(updated["footer_bible_reference"]) > 100:
+            errors.append("Bible verse reference must be 100 characters or fewer.")
+        if updated["footer_bible_verse_visible"] == "1":
+            if not updated["footer_bible_verse"]:
+                errors.append("Enter a Bible verse or turn off its display.")
+            if not updated["footer_bible_reference"]:
+                errors.append("Enter a Bible verse reference or turn off its display.")
+
+        if errors:
+            for error in errors:
+                flash(error, "error")
+            content.update(updated)
         else:
             database = get_db()
             database.executemany(

@@ -16,6 +16,15 @@ if (menuToggle && mainNav){
 let courses = JSON.parse(localStorage.getItem("gpaCourses")) || [];
 let editingIndex = null;
 
+const gradingSystemSelect = document.getElementById("grading-system");
+if (gradingSystemSelect) {
+    const savedGradingSystem = localStorage.getItem("gradingSystem") || "5";
+    gradingSystemSelect.value = ["4", "5"].includes(savedGradingSystem) ? savedGradingSystem : "5";
+    gradingSystemSelect.addEventListener("change", () => {
+        localStorage.setItem("gradingSystem", gradingSystemSelect.value);
+    });
+}
+
 // Unified render function to accurately draw table data based on HTML headers
 function renderCourses() {
     const courseList = document.getElementById("course-list");
@@ -112,7 +121,10 @@ if (calculateGpaBtn) {
             const response = await fetch("/calculate-gpa", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ gpaCourses: courses }) // Send clean array data directly
+                body: JSON.stringify({
+                    gpaCourses: courses,
+                    grading_system: gradingSystemSelect ? gradingSystemSelect.value : "5"
+                })
             });
 
             const result = await response.json();
