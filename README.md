@@ -41,14 +41,6 @@ SDK or authentication API.
    - `SECRET_KEY`: a strong, randomly generated secret.
    - `SESSION_COOKIE_SECURE`: `true`.
 
-   For gallery-cover uploads that must persist on serverless deployments,
-   also configure Cloudinary:
-   - `CLOUDINARY_CLOUD_NAME`
-   - `CLOUDINARY_API_KEY`
-   - `CLOUDINARY_API_SECRET`
-
-   Alternatively, provide `CLOUDINARY_URL` from the Cloudinary dashboard.
-
    Set these for Production. If you deploy Preview builds, connect a separate
    database or database branch and use its own `DATABASE_URL` so previews cannot
    change production data.

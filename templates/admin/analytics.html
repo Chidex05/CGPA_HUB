@@ -22,7 +22,7 @@
   </section>
   <section class="panel">
     <div class="panel-heading"><div><h2>Top pages</h2><p>Ranked by views for the last 30 days.</p></div></div>
-    {% if top_pages %}
+    {% if top_pages %} 
     <ul class="page-list">{% for page in top_pages %}<li><span>{{ page.path }}</span><strong>{{ page.views }}</strong></li>{% endfor %}</ul>
     {% else %}<p class="panel-empty">Popular pages will appear here as aggregate totals build up.</p>{% endif %}
   </section>
