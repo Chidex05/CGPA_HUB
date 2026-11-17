@@ -5,7 +5,7 @@ const articleCount = document.getElementById("article-count");
 const emptyState = document.getElementById("empty-state");
 
 let activeFilter = "all";
-
+ 
 function updateArticles() {
   if (!articleSearch || !articleCount || !emptyState) return;
   const articleCards = Array.from(document.querySelectorAll(".article-card"));

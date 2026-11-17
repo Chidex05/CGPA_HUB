@@ -66,7 +66,7 @@
       <section class="featured-story" aria-labelledby="featured-title">
         <div class="featured-image">
           <img
-            src="{{ url_for('static', filename=featured.image) }}"
+            src="{{ blog_image_url(featured.image) }}"
             alt="{{ featured.image_alt }}"
           />
           <span class="image-label"><i class="fa-solid fa-star" aria-hidden="true"></i> Editor's pick</span>
@@ -114,7 +114,7 @@
           {% for post in posts %}
           <article class="article-card" data-category="{{ category_filter_id(post.category) }}" data-search="{{ post.title }} {{ post.excerpt }} {{ category_label(post.category) }}">
             <div class="card-image">
-              <img src="{{ url_for('static', filename=post.image) }}" alt="{{ post.image_alt }}" loading="lazy" />
+              <img src="{{ blog_image_url(post.image) }}" alt="{{ post.image_alt }}" loading="lazy" />
               <span class="card-category">{{ category_label(post.category) }}</span>
             </div>
             <div class="card-copy">

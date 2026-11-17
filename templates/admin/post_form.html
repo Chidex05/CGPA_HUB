@@ -5,7 +5,7 @@
   <div><p class="eyebrow">BLOG MANAGEMENT</p><h1>{% if post.id %}Edit article{% else %}Write an article{% endif %}</h1><p>Save a draft now, or publish when it is ready.</p></div>
   <a class="button button-quiet" href="{{ url_for('admin.posts') }}">← All articles</a>
 </section>
-<form class="panel admin-form editor-form" method="post">
+<form class="panel admin-form editor-form" method="post" enctype="multipart/form-data">
   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
   <div class="form-grid">
     <div class="field-full"><label for="title">Article title</label><input id="title" name="title" maxlength="160" value="{{ post.title or '' }}" required /></div>
@@ -17,7 +17,25 @@
     </select></div>
     <div><label for="read_time">Reading time (minutes)</label><input id="read_time" name="read_time" type="number" min="1" max="120" value="{{ post.read_time or 4 }}" required /></div>
     <div class="field-full"><label for="excerpt">Short description <span class="field-hint">Up to 280 characters</span></label><textarea id="excerpt" name="excerpt" rows="3" maxlength="280" required>{{ post.excerpt or '' }}</textarea></div>
-    <div><label for="image">Cover image</label><select id="image" name="image" required>{% for image in images %}<option value="{{ image }}" {% if post.image == image %}selected{% endif %}>{{ image.split('/')[-1] }}</option>{% endfor %}</select></div>
+    <div>
+      <label for="image">Choose a cover image</label>
+      <select id="image" name="image" required>
+        {% if post.image and post.image not in images %}
+        <option value="{{ post.image }}" selected>Current upload</option>
+        {% endif %}
+        {% for image in images %}
+        <option value="{{ image }}" {% if post.image == image %}selected{% endif %}>{{ image.split('/')[-1] }}</option>
+        {% endfor %}
+      </select>
+      {% if post.image %}
+      <span class="field-hint">Current image: {{ post.image.split('/')[-1] }}</span>
+      {% endif %}
+    </div>
+    <div>
+      <label for="cover_image">Upload from your gallery</label>
+      <input id="cover_image" name="cover_image" type="file" accept="image/jpeg,image/png,image/webp" />
+      <span class="field-hint">JPG, PNG, or WebP. Maximum 5 MB.</span>
+    </div>
     <div><label for="image_alt">Image description</label><input id="image_alt" name="image_alt" maxlength="180" value="{{ post.image_alt or '' }}" required /></div>
     <div class="field-full"><label for="video_url">Related YouTube video <span class="field-hint">Optional. Paste a YouTube watch, youtu.be, Shorts, or embed link.</span></label><input id="video_url" name="video_url" type="url" maxlength="500" value="{{ post.video_url or '' }}" placeholder="https://www.youtube.com/watch?v=..." /></div>
     <div class="field-full"><label for="body">Article content</label><textarea id="body" name="body" class="article-body-input" rows="16" required>{{ post.body or '' }}</textarea><span class="field-hint">Separate paragraphs with a blank line. Text is safely displayed as plain text.</span></div>

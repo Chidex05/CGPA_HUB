@@ -5,7 +5,7 @@ import sys
 import uuid
 from datetime import date, timedelta
 
-from flask import Flask, abort, has_request_context, jsonify, render_template, request
+from flask import Flask, abort, has_request_context, jsonify, render_template, request, send_from_directory, url_for
 from werkzeug.exceptions import HTTPException
 from academic_engine import calculate_academic_record
 from admin import (
@@ -109,6 +109,14 @@ app.register_blueprint(admin_bp)
 app.teardown_appcontext(close_db)
 
 
+@app.route('/uploads/<path:filename>')
+def uploaded_image(filename):
+    upload_folder = app.config.get("UPLOAD_FOLDER")
+    if not upload_folder:
+        abort(404)
+    return send_from_directory(upload_folder, filename)
+
+
 @app.errorhandler(Exception)
 def handle_unexpected_error(error):
     if isinstance(error, HTTPException):
@@ -197,6 +205,17 @@ def inject_current_year():
         "footer_bible_reference": content["footer_bible_reference"],
         "show_footer_bible_verse": content["footer_bible_verse_visible"] == "1",
     }
+
+
+def blog_image_url(image):
+    if str(image).startswith("/uploads/"):
+        return url_for("uploaded_image", filename=str(image).removeprefix("/uploads/"))
+    if str(image).startswith("https://"):
+        return str(image)
+    return url_for("static", filename=str(image))
+
+
+app.jinja_env.globals["blog_image_url"] = blog_image_url
 
 
 @app.after_request

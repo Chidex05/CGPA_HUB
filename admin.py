@@ -4,10 +4,12 @@ import os
 import re
 import secrets
 import unicodedata
+import uuid
 from datetime import date, timedelta
 from functools import wraps
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
+from io import BytesIO
 
 import click
 from flask import (
@@ -23,6 +25,8 @@ from flask import (
     url_for,
 )
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
+from PIL import Image, UnidentifiedImageError
 
 from database import connect_database
 
@@ -396,6 +400,8 @@ def close_db(_error=None):
 def initialize_database(app):
     app.config["DATABASE_URL"] = os.environ.get("DATABASE_URL", "").strip()
     app.config["ADMIN_DATABASE"] = os.path.join(app.instance_path, "cgpa_hub.sqlite3")
+    app.config["UPLOAD_FOLDER"] = os.path.join(app.instance_path, "uploads")
+    app.config["MAX_CONTENT_LENGTH"] = 5 * 1024 * 1024
 
     if not app.config["DATABASE_URL"]:
         os.makedirs(app.instance_path, exist_ok=True)
@@ -579,11 +585,81 @@ def get_content():
 
 def available_images():
     image_dir = Path(current_app.static_folder) / "Images"
-    return sorted(
+    images = [
         f"Images/{filename}"
         for filename in os.listdir(image_dir)
         if Path(filename).suffix.lower() in {".jpg", ".jpeg", ".png", ".webp"}
+    ]
+    upload_dir = Path(current_app.config["UPLOAD_FOLDER"])
+    if upload_dir.is_dir():
+        images.extend(
+            f"/uploads/{filename}"
+            for filename in os.listdir(upload_dir)
+            if Path(filename).suffix.lower() in {".jpg", ".jpeg", ".png", ".webp"}
+        )
+    return sorted(images)
+
+
+def save_cover_image(upload):
+    if not upload or not upload.filename:
+        return None, None
+
+    filename = secure_filename(upload.filename)
+    extension = Path(filename).suffix.lower()
+    if extension not in {".jpg", ".jpeg", ".png", ".webp"}:
+        return None, "Choose a JPG, PNG, or WebP image."
+
+    try:
+        payload = upload.read()
+        if len(payload) > 5 * 1024 * 1024:
+            return None, "The cover image must be 5 MB or smaller."
+        with Image.open(BytesIO(payload)) as image:
+            image.verify()
+        with Image.open(BytesIO(payload)) as image:
+            image_format = image.format
+            if image_format not in {"JPEG", "PNG", "WEBP"}:
+                return None, "Choose a JPG, PNG, or WebP image."
+    except (UnidentifiedImageError, OSError):
+        return None, "The selected file is not a valid image."
+
+    cloudinary_url = os.environ.get("CLOUDINARY_URL", "").strip()
+    cloudinary_configured = bool(cloudinary_url) or all(
+        os.environ.get(key, "").strip()
+        for key in ("CLOUDINARY_CLOUD_NAME", "CLOUDINARY_API_KEY", "CLOUDINARY_API_SECRET")
     )
+    if cloudinary_configured:
+        try:
+            import cloudinary
+            import cloudinary.uploader
+
+            if cloudinary_url:
+                cloudinary.config(secure=True)
+            else:
+                cloudinary.config(
+                    cloud_name=os.environ["CLOUDINARY_CLOUD_NAME"],
+                    api_key=os.environ["CLOUDINARY_API_KEY"],
+                    api_secret=os.environ["CLOUDINARY_API_SECRET"],
+                    secure=True,
+                )
+            uploaded = cloudinary.uploader.upload(
+                BytesIO(payload),
+                folder="cgpa-hub/blog",
+                resource_type="image",
+                overwrite=False,
+                unique_filename=True,
+            )
+            secure_url = uploaded.get("secure_url")
+            if secure_url:
+                return secure_url, None
+        except Exception:
+            return None, "The image could not be uploaded. Please try again."
+
+    upload_dir = Path(current_app.config["UPLOAD_FOLDER"])
+    upload_dir.mkdir(parents=True, exist_ok=True)
+    stored_name = f"{uuid.uuid4().hex}{extension}"
+    stored_path = upload_dir / stored_name
+    stored_path.write_bytes(payload)
+    return f"/uploads/{stored_name}", None
 
 
 def unique_slug(title, post_id=None):
@@ -605,7 +681,8 @@ def validate_post_form():
     category = request.form.get("category", "").strip()
     excerpt = request.form.get("excerpt", "").strip()
     body = request.form.get("body", "").strip()
-    image = request.form.get("image", "").strip()
+    uploaded_image, upload_error = save_cover_image(request.files.get("cover_image"))
+    image = uploaded_image or request.form.get("image", "").strip()
     image_alt = request.form.get("image_alt", "").strip()
     video_url = normalize_youtube_url(request.form.get("video_url", ""))
     try:
@@ -627,7 +704,16 @@ def validate_post_form():
         errors.append("Enter an excerpt between 1 and 280 characters.")
     if not body:
         errors.append("Article content cannot be empty.")
-    if image not in available_images():
+    if upload_error:
+        errors.append(upload_error)
+    if (
+        image not in available_images()
+        and not (
+            image.startswith("https://")
+            and urlsplit(image).hostname in {"res.cloudinary.com", "cloudinary.com"}
+        )
+        and not image.startswith("/uploads/")
+    ):
         errors.append("Choose an image from the available library.")
     if not image_alt or len(image_alt) > 180:
         errors.append("Enter image alt text between 1 and 180 characters.")

@@ -26,7 +26,7 @@
       {% endif %}
       <article>
         <a class="article-back-link article-mobile-back" href="{{ url_for('blog') }}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> All articles</a>
-        <div class="article-cover"><img src="{{ url_for('static', filename=post.image) }}" alt="{{ post.image_alt }}" /></div>
+        <div class="article-cover"><img src="{{ blog_image_url(post.image) }}" alt="{{ post.image_alt }}" /></div>
         <header class="article-header">
           <p class="article-category">{{ category_label(post.category) }}</p>
           <h1>{{ post.title }}</h1>
