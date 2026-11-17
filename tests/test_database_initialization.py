@@ -1,5 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import nullcontext
+from io import BytesIO
 import os
 import sqlite3
 from pathlib import Path
@@ -8,6 +9,7 @@ import unittest
 from unittest.mock import patch
 
 from flask import Flask
+from werkzeug.datastructures import FileStorage
 
 import admin
 import academic_engine
@@ -249,6 +251,132 @@ class DatabaseInitializationTests(unittest.TestCase):
         self.assertTrue(
             {post["title"] for post in admin.STARTER_POSTS}.issubset(titles)
         )
+
+    def test_gallery_table_stores_uploaded_image_metadata(self):
+        with TemporaryDirectory() as directory:
+            app = Flask("gallery-schema-test", instance_path=directory)
+            with patch.dict(
+                os.environ,
+                {"DATABASE_URL": "", "SECRET_KEY": "test"},
+            ):
+                admin.initialize_database(app)
+
+            with app.app_context():
+                database = admin.get_db()
+                asset = {
+                    "image_url": "https://res.cloudinary.com/demo/image/upload/test.png",
+                    "public_id": "cgpa-hub/blog/test",
+                    "original_name": "study.png",
+                }
+                admin.save_gallery_image(database, asset)
+                database.commit()
+                row = database.execute(
+                    "SELECT image_url, public_id, original_name FROM gallery_images"
+                ).fetchone()
+                admin.close_db()
+
+        self.assertEqual(row["image_url"], asset["image_url"])
+        self.assertEqual(row["public_id"], asset["public_id"])
+        self.assertEqual(row["original_name"], asset["original_name"])
+
+    def test_gallery_upload_requires_cloudinary_configuration(self):
+        from PIL import Image
+
+        png_stream = BytesIO()
+        Image.new("RGB", (1, 1)).save(png_stream, format="PNG")
+        upload = FileStorage(
+            stream=BytesIO(png_stream.getvalue()),
+            filename="study.png",
+            content_type="image/png",
+        )
+        app = Flask("gallery-upload-test")
+        with app.app_context(), patch.dict(
+            os.environ,
+            {
+                "CLOUDINARY_URL": "",
+                "CLOUDINARY_CLOUD_NAME": "",
+                "CLOUDINARY_API_KEY": "",
+                "CLOUDINARY_API_SECRET": "",
+            },
+        ):
+            asset, error = admin.upload_gallery_image(upload)
+
+        self.assertIsNone(asset)
+        self.assertIn("not configured", error)
+
+    def test_gallery_upload_saves_only_validated_cloudinary_url(self):
+        from PIL import Image
+        import cloudinary.uploader
+
+        png_stream = BytesIO()
+        Image.new("RGB", (1, 1)).save(png_stream, format="PNG")
+        app = Flask("gallery-cloudinary-test")
+        credentials = {
+            "CLOUDINARY_URL": "",
+            "CLOUDINARY_CLOUD_NAME": "demo",
+            "CLOUDINARY_API_KEY": "test-key",
+            "CLOUDINARY_API_SECRET": "test-secret",
+        }
+        response = {
+            "secure_url": "https://res.cloudinary.com/demo/image/upload/test.png",
+            "public_id": "cgpa-hub/blog/test",
+        }
+        invalid_response = {
+            "secure_url": "https://res.cloudinary.com.attacker.invalid/a.png",
+            "public_id": "cgpa-hub/blog/test",
+        }
+        with app.app_context(), patch.dict(os.environ, credentials), patch.object(
+            cloudinary.uploader,
+            "upload",
+            side_effect=[response, invalid_response],
+        ) as cloudinary_upload:
+            asset, error = admin.upload_gallery_image(
+                FileStorage(
+                    stream=BytesIO(png_stream.getvalue()),
+                    filename="study.png",
+                )
+            )
+            invalid_asset, invalid_error = admin.upload_gallery_image(
+                FileStorage(
+                    stream=BytesIO(png_stream.getvalue()),
+                    filename="study.png",
+                )
+            )
+
+        self.assertIsNone(error)
+        self.assertEqual(asset["image_url"], response["secure_url"])
+        self.assertEqual(asset["public_id"], response["public_id"])
+        self.assertEqual(asset["original_name"], "study.png")
+        self.assertIsNone(invalid_asset)
+        self.assertIn("invalid response", invalid_error)
+        self.assertEqual(cloudinary_upload.call_count, 2)
+
+    def test_new_post_form_renders_gallery_upload_controls(self):
+        project_root = Path(admin.__file__).resolve().parent
+        with TemporaryDirectory() as directory:
+            app = Flask(
+                "gallery-form-test",
+                template_folder=str(project_root / "templates"),
+                static_folder=str(project_root / "static"),
+                instance_path=directory,
+            )
+            app.config["TESTING"] = True
+            app.register_blueprint(admin.admin_bp)
+            app.add_url_rule("/", endpoint="home", view_func=lambda: "")
+            app.teardown_appcontext(admin.close_db)
+            with patch.dict(
+                os.environ,
+                {"DATABASE_URL": "", "SECRET_KEY": "gallery-form-test-secret"},
+            ):
+                admin.initialize_database(app)
+                client = app.test_client()
+                with client.session_transaction() as session:
+                    session["admin_id"] = 1
+                response = client.get("/admin/posts/new")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'enctype="multipart/form-data"', response.data)
+        self.assertIn(b'name="cover_image"', response.data)
 
     def test_youtube_links_are_restricted_to_valid_video_urls(self):
         video_id = "abcDEF123_-"
