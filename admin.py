@@ -658,8 +658,8 @@ def upload_gallery_image(upload):
         import cloudinary.uploader
         from cloudinary.exceptions import Error as CloudinaryError
         from requests.exceptions import RequestException
-    except ImportError:
-        current_app.logger.error("Gallery upload dependency Cloudinary is unavailable.")
+    except ImportError as error:
+        current_app.logger.error("Gallery upload import failed. Missing module: %s", error.name)
         return None, "Image uploads are temporarily unavailable. Please try again later."
 
     try:
