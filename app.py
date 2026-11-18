@@ -235,7 +235,7 @@ def record_public_pageview(response):
                 """
                 INSERT INTO daily_pageviews (view_date, path, views)
                 VALUES (?, ?, 1)
-                ON CONFLICT(view_date, path) DO UPDATE SET views = views + 1
+                ON CONFLICT(view_date, path) DO UPDATE SET views = daily_pageviews.views + 1
                 """,
                 (date.today().isoformat(), request.path),
             )
