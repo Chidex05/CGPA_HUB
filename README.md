@@ -41,6 +41,16 @@ SDK or authentication API.
    - `SECRET_KEY`: a strong, randomly generated secret.
    - `SESSION_COOKIE_SECURE`: `true`.
 
+   To enable persistent blog image uploads from the admin panel, also set
+   Cloudinary credentials:
+   - `CLOUDINARY_CLOUD_NAME`
+   - `CLOUDINARY_API_KEY`
+   - `CLOUDINARY_API_SECRET`
+
+   Or set `CLOUDINARY_URL`. Image upload dependencies are loaded only when an
+   admin uploads an image; the public pages and analytics do not depend on
+   Cloudinary being configured.
+
    Set these for Production. If you deploy Preview builds, connect a separate
    database or database branch and use its own `DATABASE_URL` so previews cannot
    change production data.

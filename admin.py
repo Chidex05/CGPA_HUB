@@ -24,6 +24,7 @@ from flask import (
     url_for,
 )
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
 
 from database import connect_database
 
@@ -454,6 +455,15 @@ def initialize_database(app):
                 PRIMARY KEY (view_date, path)
             )
         """,
+        f"""
+            CREATE TABLE IF NOT EXISTS gallery_images (
+                id {identity_column},
+                image_url TEXT NOT NULL UNIQUE,
+                public_id TEXT NOT NULL,
+                original_name TEXT NOT NULL,
+                created_at TEXT NOT NULL DEFAULT {timestamp_default}
+            )
+        """,
         """
             CREATE TABLE IF NOT EXISTS login_attempts (
                 key_hash TEXT PRIMARY KEY,
@@ -588,6 +598,130 @@ def available_images():
     )
 
 
+def uploaded_images():
+    return get_db().execute(
+        """
+        SELECT image_url, original_name
+        FROM gallery_images
+        ORDER BY id DESC
+        """
+    ).fetchall()
+
+
+def upload_gallery_image(upload):
+    if not upload or not upload.filename:
+        return None, None
+
+    filename = secure_filename(upload.filename)
+    extension = Path(filename).suffix.lower()
+    supported_formats = {
+        ".jpg": "JPEG",
+        ".jpeg": "JPEG",
+        ".png": "PNG",
+        ".webp": "WEBP",
+    }
+    if extension not in supported_formats:
+        return None, "Choose a JPG, PNG, or WebP image."
+
+    payload = upload.stream.read(5 * 1024 * 1024 + 1)
+    if len(payload) > 5 * 1024 * 1024:
+        return None, "The image must be 5 MB or smaller."
+
+    try:
+        from io import BytesIO
+        from PIL import Image, UnidentifiedImageError
+
+        with Image.open(BytesIO(payload)) as image:
+            image.verify()
+        with Image.open(BytesIO(payload)) as image:
+            if image.format != supported_formats[extension]:
+                return None, "The image extension does not match its file contents."
+            if image.width * image.height > 40_000_000:
+                return None, "The image dimensions are too large."
+    except ImportError:
+        current_app.logger.error("Gallery upload dependency Pillow is unavailable.")
+        return None, "Image uploads are temporarily unavailable. Please try again later."
+    except (UnidentifiedImageError, OSError, SyntaxError):
+        return None, "The selected file is not a valid image."
+
+    cloudinary_url = os.environ.get("CLOUDINARY_URL", "").strip()
+    cloudinary_credentials = {
+        "cloud_name": os.environ.get("CLOUDINARY_CLOUD_NAME", "").strip(),
+        "api_key": os.environ.get("CLOUDINARY_API_KEY", "").strip(),
+        "api_secret": os.environ.get("CLOUDINARY_API_SECRET", "").strip(),
+    }
+    if not cloudinary_url and not all(cloudinary_credentials.values()):
+        return None, "Image gallery uploads are not configured. Please contact the site administrator."
+
+    try:
+        import cloudinary
+        import cloudinary.uploader
+        from cloudinary.exceptions import Error as CloudinaryError
+        from requests.exceptions import RequestException
+    except ImportError as error:
+        current_app.logger.error("Gallery upload import failed. Missing module: %s", error.name)
+        return None, "Image uploads are temporarily unavailable. Please try again later."
+
+    try:
+        if cloudinary_url:
+            cloudinary.config(secure=True)
+        else:
+            cloudinary.config(**cloudinary_credentials, secure=True)
+        result = cloudinary.uploader.upload(
+            BytesIO(payload),
+            folder="cgpa-hub/blog",
+            resource_type="image",
+            overwrite=False,
+            unique_filename=True,
+        )
+    except (CloudinaryError, RequestException, OSError, ValueError) as error:
+        current_app.logger.error(
+            "Gallery image upload failed (%s).",
+            type(error).__name__,
+        )
+        return None, "The image could not be uploaded. Check the image storage configuration and try again."
+
+    image_url = result.get("secure_url")
+    public_id = result.get("public_id")
+    try:
+        image_location = urlsplit(image_url) if isinstance(image_url, str) else None
+        valid_image_url = (
+            image_location is not None
+            and image_location.scheme == "https"
+            and image_location.hostname == "res.cloudinary.com"
+            and image_location.username is None
+            and image_location.password is None
+            and image_location.port in (None, 443)
+        )
+    except ValueError:
+        valid_image_url = False
+    if (
+        not valid_image_url
+        or not isinstance(public_id, str)
+        or not public_id
+    ):
+        current_app.logger.error("Cloudinary returned an invalid gallery image response.")
+        return None, "The image service returned an invalid response. Please try again."
+
+    return {
+        "image_url": image_url,
+        "public_id": public_id,
+        "original_name": filename,
+    }, None
+
+
+def save_gallery_image(database, asset):
+    if asset:
+        database.execute(
+            """
+            INSERT INTO gallery_images (image_url, public_id, original_name)
+            VALUES (?, ?, ?)
+            ON CONFLICT(image_url) DO NOTHING
+            """,
+            (asset["image_url"], asset["public_id"], asset["original_name"]),
+        )
+
+
 def unique_slug(title, post_id=None):
     base_slug = slugify(title)
     if not base_slug:
@@ -602,12 +736,14 @@ def unique_slug(title, post_id=None):
         suffix += 1
 
 
-def validate_post_form():
+def validate_post_form(existing_image=None):
     title = request.form.get("title", "").strip()
     category = request.form.get("category", "").strip()
     excerpt = request.form.get("excerpt", "").strip()
     body = request.form.get("body", "").strip()
     image = request.form.get("image", "").strip()
+    cover_image = request.files.get("cover_image")
+    has_cover_upload = bool(cover_image and cover_image.filename)
     image_alt = request.form.get("image_alt", "").strip()
     video_url = normalize_youtube_url(request.form.get("video_url", ""))
     try:
@@ -629,14 +765,9 @@ def validate_post_form():
         errors.append("Enter an excerpt between 1 and 280 characters.")
     if not body:
         errors.append("Article content cannot be empty.")
-    if (
-        image not in available_images()
-        and not (
-            image.startswith("https://")
-            and urlsplit(image).hostname in {"res.cloudinary.com", "cloudinary.com"}
-        )
-        and not image.startswith("/uploads/")
-    ):
+    allowed_images = set(available_images())
+    allowed_images.update(row["image_url"] for row in uploaded_images())
+    if not has_cover_upload and image not in allowed_images and image != existing_image:
         errors.append("Choose an image from the available library.")
     if not image_alt or len(image_alt) > 180:
         errors.append("Enter image alt text between 1 and 180 characters.")
@@ -647,6 +778,14 @@ def validate_post_form():
             flash(error, "error")
         return None
 
+    uploaded_asset = None
+    if has_cover_upload:
+        uploaded_asset, upload_error = upload_gallery_image(cover_image)
+        if upload_error:
+            flash(upload_error, "error")
+            return None
+        image = uploaded_asset["image_url"]
+
     return {
         "title": title,
         "slug": unique_slug(slug_source),
@@ -655,6 +794,7 @@ def validate_post_form():
         "body": body,
         "image": image,
         "image_alt": image_alt,
+        "uploaded_asset": uploaded_asset,
         "video_url": video_url,
         "read_time": read_time,
         "is_featured": int(request.form.get("is_featured") == "1"),
@@ -866,6 +1006,7 @@ def new_post():
         post = validate_post_form()
         if post:
             database = get_db()
+            save_gallery_image(database, post["uploaded_asset"])
             database.execute(
                 """
                 UPDATE posts SET is_featured = 0
@@ -895,6 +1036,7 @@ def new_post():
         "admin/post_form.html",
         post=form_data,
         images=available_images(),
+        uploaded_images=uploaded_images(),
         category_options=POST_CATEGORY_OPTIONS,
         category_filter_id=category_filter_id,
         content=get_content(),
@@ -909,8 +1051,9 @@ def edit_post(post_id):
     if existing is None:
         abort(404)
     if request.method == "POST":
-        post = validate_post_form()
+        post = validate_post_form(existing_image=existing["image"])
         if post:
+            save_gallery_image(database, post["uploaded_asset"])
             database.execute(
                 """
                 UPDATE posts SET is_featured = 0
@@ -941,6 +1084,7 @@ def edit_post(post_id):
         "admin/post_form.html",
         post=form_data,
         images=available_images(),
+        uploaded_images=uploaded_images(),
         category_options=POST_CATEGORY_OPTIONS,
         category_filter_id=category_filter_id,
         content=get_content(),
