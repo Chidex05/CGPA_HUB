@@ -176,38 +176,31 @@ def create_verification_code(db, student_id, secret_key):
 
 
 def send_verification_email(email, code, allow_dev_mode=False):
-    api_key = os.environ.get("RESEND_API_KEY")
+    api_key = os.environ.get("BREVO_API_KEY")
     sender = os.environ.get("EMAIL_FROM")
-
-    # Local development only: simulate email delivery.
-    if allow_dev_mode:
-        print("\n" + "=" * 45)
-        print("CGPA HUB DEVELOPMENT VERIFICATION")
-        print(f"Email: {email}")
-        print(f"Verification code: {code}")
-        print("=" * 45 + "\n")
-        return True
-
     if not api_key or not sender:
-        raise RuntimeError("Email service configuration is missing.")
+        raise RuntimeError("Brevo Email service configuration is missing.")
 
     response = requests.post(
-        "https://api.resend.com/emails",
+        "https://api.brevo.com/v3/smtp/email",
         headers={
-            "Authorization": f"Bearer {api_key}",
+            "api-key": api_key,
             "Content-Type": "application/json"
         },
         json={
-            "from": sender,
-            "to": [email],
+            "sender":{"email": sender
+                      },
+            "to": [
+                {"email":email}
+            ],
             "subject": "Verify your CGPA Hub account",
-            "text": (
+            "textContent": (
                 f"Your CGPA Hub verification code is {code}.\n\n"
                 "This code expires in 10 minutes.\n"
                 "If you did not request this, ignore this email."
             )
         },
-        timeout=15
+        timeout=20
     )
 
     response.raise_for_status()
