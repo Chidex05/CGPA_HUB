@@ -27,6 +27,7 @@ if (gradingSystemSelect) {
     gradingSystemSelect.value = ["4", "5"].includes(savedGradingSystem) ? savedGradingSystem : "5";
     gradingSystemSelect.addEventListener("change", () => {
         localStorage.setItem("gradingSystem", gradingSystemSelect.value);
+          saveStudentCgpaRecord();
     });
 }
 
@@ -93,7 +94,87 @@ function displayCourses() {
         courselist.appendChild(row);
     });
     }
+// ------------------------------
+// STUDENT ACCOUNT CGPA SYNC
+// ------------------------------
 
+let studentCgpaLoggedIn = false;
+
+async function loadStudentCgpaRecord() {
+    try {
+        const response = await fetch("/student/records/cgpa");
+
+        if (response.status === 401) {
+            studentCgpaLoggedIn = false;
+            return;
+        }
+
+        if (!response.ok) return;
+
+        studentCgpaLoggedIn = true;
+
+        const result = await response.json();
+        const record = result.record;
+
+        if (record && Array.isArray(record.courses)) {
+            courses = record.courses;
+
+            localStorage.setItem(
+                "cgpaCourses",
+                JSON.stringify(courses)
+            );
+
+            if (record.gradingSystem) {
+                localStorage.setItem(
+                    "gradingSystem",
+                    record.gradingSystem
+                );
+
+                if (gradingSystemSelect) {
+                    gradingSystemSelect.value = record.gradingSystem;
+                }
+            }
+
+            displayCourses();
+
+        } else if (courses.length > 0) {
+            await saveStudentCgpaRecord();
+        }
+
+    } catch (error) {
+        console.error("CGPA loading failed:", error);
+    }
+}
+
+
+async function saveStudentCgpaRecord() {
+    if (!studentCgpaLoggedIn) return;
+
+    try {
+        const response = await fetch("/student/records/cgpa", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-Token": window.STUDENT_CSRF_TOKEN || ""
+            },
+            body: JSON.stringify({
+                record: {
+                    courses: courses,
+                    gradingSystem: gradingSystemSelect
+                        ? gradingSystemSelect.value
+                        : "5"
+                }
+            })
+        });
+
+        if (!response.ok) {
+            console.error("CGPA record could not be saved.");
+        }
+
+    } catch (error) {
+        console.error("CGPA saving failed:", error);
+    }
+}
 
 if (sessionSelect) {sessionSelect.addEventListener("change", displayCourses);}
 if (semesterSelect) semesterSelect.addEventListener("change", displayCourses);
@@ -141,6 +222,8 @@ addCourseBtn.addEventListener("click", () => {
     }
 
     localStorage.setItem("cgpaCourses", JSON.stringify(courses));
+    saveStudentCgpaRecord();
+  
     displayCourses();
 
     courseCode.value = "";
@@ -165,6 +248,7 @@ courselist.addEventListener("click", (event) => {
             }
 
             localStorage.setItem("cgpaCourses", JSON.stringify(courses));
+            saveStudentCgpaRecord();
             displayCourses();
         }
     }
@@ -245,7 +329,8 @@ calculateBtn.addEventListener("click", () => {
       runCalculation();
     });
 
-    window.addEventListener("DOMContentLoaded", function() {
+    window.addEventListener("DOMContentLoaded",async function() {
+        await loadStudentCgpaRecord();
       displayCourses();
     
 });

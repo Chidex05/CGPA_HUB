@@ -18,6 +18,15 @@
     <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
 </head>
 <body class="background">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+        <div style="padding: 15px; margin: 15px; background: #d4edda; color: #155724; border-radius: 8px;">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endwith %}
+
+  
     <div id="nav-bar">
       <div class="logo">
          <h2>
@@ -317,6 +326,22 @@
 
    </div>
 
+
+
+   <div class="newsletter-footer">
+    <h2>Stay Updated</h2>
+    <p>Get scholarships, opportunities and student updates delivered to your inbox.</p>
+
+    <form action="{{ url_for('admin.subscribe_newsletter') }}" method="POST">
+        <input 
+            type="email" 
+            name="email" 
+            placeholder="Enter your email address" 
+            required
+        >
+        <button type="submit">Subscribe</button>
+    </form>
+</div>
     </div>
 
 

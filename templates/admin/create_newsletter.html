@@ -1,0 +1,61 @@
+
+{% extends "admin/base.html" %}
+
+{% block content %}
+<section class="newsletter-editor">
+
+    <div class="newsletter-editor-header">
+        <a href="{{ url_for('admin.newsletters') }}" class="newsletter-back-link">
+            <i class="fa-solid fa-arrow-left"></i> Back to Newsletters
+        </a>
+
+        <h1>Create Newsletter</h1>
+        <p>Prepare a newsletter for CGPA Hub subscribers.</p>
+    </div>
+
+    <form method="POST" class="newsletter-form">
+
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="newsletter-form-group">
+            <label for="title">Newsletter Title</label>
+            <input
+                type="text"
+                id="title"
+                name="title"
+                placeholder="e.g. CGPA Hub Weekly Digest"
+                required
+            >
+        </div>
+
+        <div class="newsletter-form-group">
+            <label for="subject">Email Subject</label>
+            <input
+                type="text"
+                id="subject"
+                name="subject"
+                placeholder="e.g. Scholarships, Campus Updates & Opportunities"
+                required
+            >
+        </div>
+
+        <div class="newsletter-form-group">
+            <label for="content">Newsletter Content</label>
+            <textarea
+                id="content"
+                name="content"
+                rows="16"
+                placeholder="Write your newsletter content here..."
+                required
+            ></textarea>
+        </div>
+
+        <button type="submit" class="newsletter-save-btn">
+            <i class="fa-solid fa-floppy-disk"></i>
+            Save Draft
+        </button>
+
+    </form>
+
+</section>
+{% endblock %}

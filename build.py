@@ -1,3 +1,4 @@
+#Copyright (c) 2026 CGPA Hub. All right reserved.
 from pathlib import Path
 import shutil
 

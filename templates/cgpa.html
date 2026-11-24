@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="{{url_for('static', filename='css/all.min.css')}}">
       <link rel="stylesheet" href="{{ url_for('static', filename='cgpa.css') }}">
 </head>
+
 <body class="background">
     <div id="nav-bar">
       <div class="logo">
@@ -67,22 +68,18 @@
          <div class="gpa-image">
             <img src="/static/Images/books2.png" alt="">          
         </div>
-
     </div>
 </section>
 
 
-
 <main class="main-cgpa">
-
-<div class="control-div">
-  
- <div class="cgpa-hero">
-  <i class="fa-solid fa-graduation-cap"></i>
-  <h2>Semester & Session Management</h2>
-  <p>Select the academic session and semester to manage your courses</p>
+  <div class="control-div">
+     <div class="cgpa-hero">
+        <i class="fa-solid fa-graduation-cap"></i>
+        <h2>Semester & Session Management</h2>
+        <p>Select the academic session and semester to manage your courses</p>
  
-  <div class="form-row">
+  <div class="form-row"> 
     <div class="form-group">
       <label for="grading-system">Grading System</label>
       <select id="grading-system">
@@ -92,7 +89,7 @@
       <small>On the 4-point scale, E and F are 0 grade points.</small>
     </div>
 
-    <!-- Academic Session Dropdown -->
+     
     <div class="form-group">
       <label for="choose-session">Academic Session</label>
       <select id="choose-session">
@@ -226,7 +223,9 @@
   <p>@ 2026 CGPA Hub. Your Academic Success, Our Priority. </p>
  </footer>
     
-
+<script>
+    window.STUDENT_CSRF_TOKEN = "{{ student_csrf_token() }}";
+</script>
     
 
 <script src="{{url_for('static', filename='cgpa.js')}}"></script>

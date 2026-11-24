@@ -1,0 +1,36 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unsubscribe | CGPA Hub</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <section class="unsubscribe-page">
+        <div class="unsubscribe-card">
+
+            <h1>CGPA Hub</h1>
+
+            <p>{{ message }}</p>
+
+            {% if message == "Are you sure you want to unsubscribe?" %}
+            <form method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="unsubscribe-btn">
+                    Confirm Unsubscribe
+                </button>
+            </form>
+            {% endif %}
+
+            <a href="{{ url_for('home') }}" class="unsubscribe-home">
+                Return to Homepage
+            </a>
+
+        </div>
+    </section>
+
+</body>
+</html>

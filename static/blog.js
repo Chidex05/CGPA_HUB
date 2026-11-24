@@ -7,7 +7,7 @@ const emptyState = document.getElementById("empty-state");
 let activeFilter = "all";
  
 function updateArticles() {
-  if (!articleS earch || !articleCount || !emptyState) return;
+  if (!articleSearch || !articleCount || !emptyState) return;
   const articleCards = Array.from(document.querySelectorAll(".article-card"));
   const query = articleSearch.value.trim().toLocaleLowerCase();
   let visibleCount = 0;
