@@ -1,6 +1,23 @@
 // ==========================================================================
 // FIXED DASHBOARD LOGIC ENGINE
-// ==========================================================================
+// ========================================================================
+// console.log("Dashbboard is loaded")
+// const menuToggle= document.getElementById("menu-toggle");
+// const mainNav= document.getElementById("main-nav");
+// if (menuToggle && mainNav){
+//     menuToggle.addEventListener("click",function()
+//     alert("Menu button clicked!");
+    
+//     {const isOpen= mainNav.classList.toggle("active");
+//     menuToggle.innerHTML= isOpen ? '<i class= "fa-solid fa-xmark"></i>':
+//      '<i class= "fa-solid fa-bars"></i>';
+//      menuToggle.setAttribute("aria-expanded", isOpen);
+//      menuToggle.setAttribute("aria-label", isOpen ? "close navigation menu": "Open navigation menu");
+
+// }); 
+// }
+
+
 const menuToggle= document.getElementById("menu-toggle");
 const mainNav= document.getElementById("main-nav");
 if (menuToggle && mainNav){
@@ -13,7 +30,6 @@ if (menuToggle && mainNav){
 
 }); 
 }
-
 function runDashboardEngine() {
     // 1. Pull the data array securely out of local storage
     const storedData = localStorage.getItem("cgpaCourses");

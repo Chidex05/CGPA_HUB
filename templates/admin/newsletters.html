@@ -1,0 +1,157 @@
+{% extends "admin/base.html" %}
+<style>
+     .subscriber-summary{
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 20px !important;
+}
+.subscriber-stat-card{
+  background: #15121e !important; 
+  border: 1px solid rgba(165, 109, 244, 0.3) !important;
+  border-radius: 14px !important;
+  color: #f5f1fb;
+}
+.subscriber-stat-card h3{
+  color: #a49caf !important;
+}
+.subscriber-stat-card p{
+  color: #a56df4 !important;
+  font-size: 2rem !important;
+  font-weight: 700 !important;
+}
+
+@media(max-width: 600px){
+  .subscriber-summary{
+    grid-template-columns: 1fr !important;
+  }
+}
+
+</style>
+{% block content %}
+<section class="newsletter-management">
+
+    <div class="newsletter-header">
+        <div>
+            <h1>Newsletters</h1>
+            <p>Manage and create newsletters for CGPA Hub subscribers.</p>
+        </div>
+
+        <a href="{{ url_for('admin.create_newsletter') }}" class="newsletter-create-btn">
+            <i class="fa-solid fa-plus"></i>
+            Create Newsletter
+        </a>
+    </div>
+
+    <!-- Subscriber Statistics -->
+    <div class="subscriber-summary">
+        <div class="subscriber-stat-card">
+            <h3>Total Subscribers</h3>
+            <p>{{ subscriber_stats.total or 0 }}</p>
+        </div>
+
+        <div class="subscriber-stat-card">
+            <h3>Active Subscribers</h3>
+            <p>{{ subscriber_stats.active or 0 }}</p>
+        </div>
+
+        <div class="subscriber-stat-card">
+            <h3>Unsubscribed</h3>
+            <p>{{ subscriber_stats.unsubscribed or 0 }}</p>
+        </div>
+    </div>
+
+    <!-- Subscriber List -->
+    <div class="subscriber-management">
+        <div class="subscriber-header">
+            <h2>Newsletter Subscribers</h2>
+            <p>People subscribed to CGPA Hub updates.</p>
+        </div>
+
+        <div class="newsletter-table-wrapper">
+            <table class="newsletter-table">
+                <thead>
+                    <tr>
+                        <th>Email Address</th>
+                        <th>Status</th>
+                        <th>Date Subscribed</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for subscriber in subscribers %}
+                    <tr>
+                        <td>{{ subscriber.email }}</td>
+                        <td>
+                            <span class="newsletter-status {{ subscriber.status }}">
+                                {{ subscriber.status|capitalize }}
+                            </span>
+                        </td>
+                        <td>{{ subscriber.subscribed_at }}</td>
+                    </tr>
+
+                    {% else %}
+                    <tr>
+                        <td colspan="3" class="newsletter-empty">
+                            No subscribers yet.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Newsletter List -->
+    <div class="newsletter-table-wrapper">
+        <table class="newsletter-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Email Subject</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for newsletter in newsletters %}
+                <tr>
+                    <td>{{ newsletter.title }}</td>
+                    <td>{{ newsletter.subject }}</td>
+                    <td>
+                        <span class="newsletter-status {{ newsletter.status }}">
+                            {{ newsletter.status|capitalize }}
+                        </span>
+                    </td>
+                    <td>{{ newsletter.created_at }}</td>
+                    <td>
+                        {% if newsletter.status == 'draft' %}
+                        <form method="POST"
+                              action="{{ url_for('admin.publish_newsletter', newsletter_id=newsletter.id) }}">
+
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                            <button type="submit" class="newsletter-publish-btn">
+                                Publish
+                            </button>
+                        </form>
+                        {% else %}
+                            Published
+                        {% endif %}
+                    </td>
+                </tr>
+
+                {% else %}
+                <tr>
+                    <td colspan="5" class="newsletter-empty">
+                        No newsletters created yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</section>
+{% endblock %}

@@ -5,10 +5,12 @@ import re
 import secrets
 import unicodedata
 import uuid
+import html
 from datetime import date, timedelta
 from functools import wraps
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
+from student_auth import send_newsletter_email
 
 import click
 from flask import (
@@ -395,6 +397,46 @@ def close_db(_error=None):
         database.close()
 
 
+
+def initialize_newsletter_tables(app):
+    with app.app_context():
+        db = get_db()
+
+        database_url = app.config.get("DATABASE_URL") or ""
+        is_postgres = database_url.startswith(("postgres://", "postgresql://"))
+
+        id_column = (
+            "BIGSERIAL PRIMARY KEY"
+            if is_postgres
+            else "INTEGER PRIMARY KEY AUTOINCREMENT"
+        )
+
+        db.execute(f"""
+            CREATE TABLE IF NOT EXISTS newsletter_subscribers (
+                id {id_column},
+                email TEXT NOT NULL UNIQUE,
+                status TEXT NOT NULL DEFAULT 'active',
+                unsubscribe_token TEXT UNIQUE,
+                subscribed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                unsubscribed_at TIMESTAMP
+            )
+        """)
+
+        db.execute(f"""
+            CREATE TABLE IF NOT EXISTS newsletters (
+                id {id_column},
+                title TEXT NOT NULL,
+                subject TEXT NOT NULL,
+                content TEXT NOT NULL,
+                status TEXT NOT NULL DEFAULT 'draft',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                published_at TIMESTAMP
+            )
+        """)
+
+        db.commit()
+
+
 def initialize_database(app):
     app.config["DATABASE_URL"] = os.environ.get("DATABASE_URL", "").strip()
     app.config["ADMIN_DATABASE"] = os.path.join(app.instance_path, "cgpa_hub.sqlite3")
@@ -421,7 +463,7 @@ def initialize_database(app):
                 username TEXT NOT NULL UNIQUE,
                 password_hash TEXT NOT NULL,
                 created_at TEXT NOT NULL DEFAULT {timestamp_default}
-            )
+            )    
         """,
         """
             CREATE TABLE IF NOT EXISTS site_content (
@@ -477,7 +519,64 @@ def initialize_database(app):
                 value TEXT NOT NULL
             )
         """,
-    ]
+        f"""
+        CREATE TABLE IF NOT EXISTS students (
+            id {identity_column},
+            email TEXT NOT NULL UNIQUE,
+            password_hash TEXT NOT NULL,
+            is_verified INTEGER NOT NULL DEFAULT 0,
+            created_at TEXT NOT NULL DEFAULT {timestamp_default}
+        )
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS email_verification (
+            student_id INTEGER PRIMARY KEY,
+            code_hash TEXT NOT NULL,
+            expires_at TEXT NOT NULL,
+            attempts INTEGER NOT NULL DEFAULT 0,
+            created_at TEXT NOT NULL,
+            FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
+        )
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS student_records (
+            student_id INTEGER NOT NULL,
+            record_type TEXT NOT NULL,
+            record_data TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            PRIMARY KEY (student_id, record_type),
+            FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
+        )
+        """,
+                f"""
+        CREATE TABLE IF NOT EXISTS newsletter_subscribers (
+            id {identity_column},
+            email TEXT NOT NULL UNIQUE,
+            status TEXT NOT NULL DEFAULT 'active',
+            unsubscribe_token TEXT NOT NULL UNIQUE,
+            subscribed_at TEXT NOT NULL DEFAULT {timestamp_default},
+            unsubscribed_at TEXT
+        )
+        """,
+                f"""
+        CREATE TABLE IF NOT EXISTS newsletters (
+            id {identity_column},
+            title TEXT NOT NULL,
+            subject TEXT NOT NULL,
+            content TEXT NOT NULL,
+            status TEXT NOT NULL DEFAULT 'draft',
+            created_at TEXT NOT NULL DEFAULT {timestamp_default},
+            updated_at TEXT NOT NULL DEFAULT {timestamp_default},
+            published_at TEXT
+        )
+        """,
+    ] 
+
+
+
+
+
+
 
     with connect_database(
         app.config["DATABASE_URL"],
@@ -493,14 +592,30 @@ def initialize_database(app):
 
         for statement in schema:
             database.execute(statement)
+
+        student_columns = {
+            column.name if hasattr(column, "name") else column[0]
+            for column in database.execute(
+                "SELECT * FROM students LIMIT 0"
+            ).description or ()
+        }
+
+        if "full_name" not in student_columns:
+            database.execute(
+                "ALTER TABLE students ADD COLUMN full_name TEXT NOT NULL DEFAULT ''"
+            )
+
         post_columns = {
             column.name if hasattr(column, "name") else column[0]
             for column in database.execute("SELECT * FROM posts LIMIT 0").description or ()
         }
+
         if "video_url" not in post_columns:
             database.execute(
                 "ALTER TABLE posts ADD COLUMN video_url TEXT NOT NULL DEFAULT ''"
             )
+
+
         database.executemany(
             """
             INSERT INTO site_content (key, value) VALUES (?, ?)
@@ -818,7 +933,11 @@ def set_login_attempts(key_hash, attempts, window_started):
 
 @admin_bp.before_request
 def enforce_admin_csrf():
-    if request.method == "POST":
+    public_csrf_exempt_endpoints = {
+        "admin.subscribe_newsletter",
+        "admin.unsubscribe_newsletter",
+    }
+    if request.method == "POST" and request.endpoint not in public_csrf_exempt_endpoints:
         require_csrf()
 
 
@@ -1227,3 +1346,287 @@ def create_admin_command():
     finally:
         database.close()
     click.echo(f"Admin account ready for {username}.")
+
+
+@admin_bp.route("/newsletters")
+@admin_required
+def newsletters():
+    db = get_db()
+
+    newsletter_list = db.execute(
+        """
+        SELECT id, title, subject, status, created_at, published_at
+        FROM newsletters
+        ORDER BY created_at DESC
+        """
+    ).fetchall()
+
+    subscribers = db.execute(
+        """
+        SELECT id, email, status, subscribed_at
+        FROM newsletter_subscribers
+        ORDER BY subscribed_at DESC
+        """
+    ).fetchall()
+
+    subscriber_stats = db.execute(
+        """
+        SELECT
+            COUNT(*) AS total,
+            SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) AS active,
+            SUM(CASE WHEN status = 'unsubscribed' THEN 1 ELSE 0 END) AS unsubscribed
+        FROM newsletter_subscribers
+        """
+    ).fetchone()
+
+    return render_template(
+        "admin/newsletters.html",
+        newsletters=newsletter_list,
+        subscribers=subscribers,
+        subscriber_stats=subscriber_stats,
+        content=get_content()
+    )
+
+
+@admin_bp.route("/newsletters/create", methods=["GET", "POST"])
+@admin_required
+def create_newsletter():
+    if request.method == "POST":
+        title = request.form.get("title", "").strip()
+        subject = request.form.get("subject", "").strip()
+        content = request.form.get("content", "").strip()
+
+        if not title or not subject or not content:
+            flash("All newsletter fields are required.", "error")
+            return redirect(url_for("admin.create_newsletter"))
+
+        db = get_db()
+
+        db.execute(
+            """
+            INSERT INTO newsletters (title, subject, content)
+            VALUES (?, ?, ?)
+            """,
+            (title, subject, content),
+        )
+        db.commit()
+
+        flash("Newsletter saved successfully.", "success")
+        return redirect(url_for("admin.newsletters"))
+
+    return render_template("admin/create_newsletter.html",
+      content=get_content()
+    )
+
+@admin_bp.route("/newsletters/<int:newsletter_id>/publish", methods=["POST"])
+@admin_required
+def publish_newsletter(newsletter_id):
+    db = get_db()
+
+    newsletter = db.execute(
+        """
+        SELECT title, subject, content, status
+        FROM newsletters
+        WHERE id = ?
+        """,
+        (newsletter_id,)
+    ).fetchone()
+
+    if not newsletter:
+        flash("Newsletter not found.", "error")
+        return redirect(url_for("admin.newsletters"))
+
+    if newsletter["status"] != "draft":
+        flash("This newsletter has already been processed.", "error")
+        return redirect(url_for("admin.newsletters"))
+
+    subscribers = db.execute(
+        """
+        SELECT email, unsubscribe_token
+        FROM newsletter_subscribers
+        WHERE status = 'active'
+        """
+    ).fetchall()
+
+    if not subscribers:
+        flash("There are no active subscribers yet.", "error")
+        return redirect(url_for("admin.newsletters"))
+
+    # Claim the draft before sending, so another request cannot send it again.
+    claim = db.execute(
+        """
+        UPDATE newsletters
+        SET status = 'sending',
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = ? AND status = 'draft'
+        """,
+        (newsletter_id,)
+    )
+    db.commit()
+
+    if getattr(claim, "rowcount", 1) != 1:
+        flash("This newsletter has already been processed.", "error")
+        return redirect(url_for("admin.newsletters"))
+
+    safe_title = html.escape(newsletter["title"])
+    safe_content = html.escape(newsletter["content"]).replace("\\n", "<br>")
+
+    email_template = """
+        <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+            <h2>{title}</h2>
+            <p>{content}</p>
+            <p>Thank you for being part of CGPA Hub.</p>
+            <hr>
+            <p style="font-size: 13px; color: #777;">
+                You received this email because you subscribed to CGPA Hub updates.
+            </p>
+            <p style="font-size: 13px;">
+                <a href="{unsubscribe_link}">Unsubscribe from future emails</a>
+            </p>
+        </div>
+    """
+
+    sent_count = 0
+    failed_count = 0
+
+    for subscriber in subscribers:
+        public_base_url = current_app.config.get("PUBLIC_BASE_URL")
+        unsubscribe_path = url_for(
+            "admin.unsubscribe_newsletter",
+            token=subscriber["unsubscribe_token"],
+        )
+
+        if public_base_url:
+            unsubscribe_link = f"{public_base_url}{unsubscribe_path}"
+        else:
+            unsubscribe_link = url_for(
+                "admin.unsubscribe_newsletter",
+                token=subscriber["unsubscribe_token"],
+                _external=True,
+            )
+
+ 
+        subscriber_email_content = email_template.format(
+            title=safe_title,
+            content=safe_content,
+            unsubscribe_link=unsubscribe_link
+        )
+
+        try:
+            send_newsletter_email(
+                subscriber["email"],
+                newsletter["subject"],
+                subscriber_email_content
+            )
+            sent_count += 1
+
+        except Exception:
+            current_app.logger.exception("Newsletter delivery failed.")
+            failed_count += 1
+
+    final_status = "published" if failed_count == 0 else "failed"
+
+    db.execute(
+        """
+        UPDATE newsletters
+        SET status = ?,
+            published_at = CASE
+                WHEN ? = 'published' THEN CURRENT_TIMESTAMP
+                ELSE published_at
+            END,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+        """,
+        (final_status, final_status, newsletter_id)
+    )
+    db.commit()
+
+    if failed_count == 0:
+        flash(
+            f"Newsletter accepted for delivery to {sent_count} subscribers.",
+            "success"
+        )
+    else:
+        flash(
+            f"{sent_count} accepted, {failed_count} failed. "
+            "The newsletter has been marked as failed to prevent duplicate sending.",
+            "error"
+        )
+
+    return redirect(url_for("admin.newsletters"))
+
+
+@admin_bp.route("/newsletter/subscribe", methods=["POST"])
+def subscribe_newsletter():
+    email = request.form.get("email", "").strip().lower()
+
+    if not email or not re.fullmatch(
+        r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}",
+        email
+    ):
+        flash("Please enter a valid email address.", "error")
+        return redirect(url_for("home"))
+
+    db = get_db()
+
+    existing = db.execute(
+        "SELECT id, status FROM newsletter_subscribers WHERE email = ?",
+        (email,)
+    ).fetchone()
+
+    if existing:
+        flash("This email is already subscribed.", "info")
+        return redirect(url_for("home"))
+
+    token = secrets.token_urlsafe(32)
+
+    db.execute(
+        """
+        INSERT INTO newsletter_subscribers (email, unsubscribe_token)
+        VALUES (?, ?)
+        """,
+        (email, token)
+    )
+    db.commit()
+
+    flash("You're subscribed to the CGPA Hub newsletter!", "success")
+    return redirect(url_for("home"))
+
+@admin_bp.route("/newsletter/unsubscribe/<token>", methods=["GET", "POST"])
+def unsubscribe_newsletter(token):
+    db = get_db()
+
+    subscriber = db.execute(
+        """
+        SELECT id, status
+        FROM newsletter_subscribers
+        WHERE unsubscribe_token = ?
+        """,
+        (token,)
+    ).fetchone()
+
+    if not subscriber:
+        return render_template("newsletter_unsubscribe.html",
+                              message="Invalid unsubscribe link.")
+
+    if request.method == "POST":
+        db.execute(
+            """
+            UPDATE newsletter_subscribers
+            SET status = 'unsubscribed',
+                unsubscribed_at = CURRENT_TIMESTAMP
+            WHERE unsubscribe_token = ?
+            """,
+            (token,)
+        )
+        db.commit()
+
+        return render_template(
+            "newsletter_unsubscribe.html",
+            message="You have successfully unsubscribed from CGPA Hub newsletters."
+        )
+
+    return render_template(
+        "newsletter_unsubscribe.html",
+        message="Are you sure you want to unsubscribe?"
+    )

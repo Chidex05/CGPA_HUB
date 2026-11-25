@@ -265,6 +265,7 @@ th{
 
   #nav-bar {
     display: flex;
+    flex-wrap:wrap;
     justify-content: space-around;
     width: 95%;
     margin: auto;

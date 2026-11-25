@@ -16,12 +16,95 @@ if (menuToggle && mainNav){
 let courses = JSON.parse(localStorage.getItem("gpaCourses")) || [];
 let editingIndex = null;
 
+// ------------------------------
+// STUDENT ACCOUNT GPA SYNC
+// ------------------------------
+
+let studentLoggedIn = false;
+
+async function loadStudentGpaRecord() {
+    try {
+        const response = await fetch("/student/records/gpa");
+
+        if (response.status === 401) {
+            studentLoggedIn = false;
+            return;
+        }
+
+        if (!response.ok) return;
+
+        studentLoggedIn = true;
+
+        const result = await response.json();
+        const record = result.record;
+
+        if (record && Array.isArray(record.courses)) {
+            courses = record.courses;
+
+            localStorage.setItem(
+                "gpaCourses",
+                JSON.stringify(courses)
+            );
+
+            if (record.gradingSystem) {
+                localStorage.setItem(
+                    "gradingSystem",
+                    record.gradingSystem
+                );
+
+                if (gradingSystemSelect) {
+                    gradingSystemSelect.value = record.gradingSystem;
+                }
+            }
+
+            renderCourses();
+        } else if (courses.length > 0) {
+            await saveStudentGpaRecord();
+        }
+
+    } catch (error) {
+        console.error("Student GPA loading failed:", error);
+    }
+}
+
+
+async function saveStudentGpaRecord() {
+    if (!studentLoggedIn) return;
+
+    try {
+        const response = await fetch("/student/records/gpa", {
+            method: "POST",
+            headers: {
+               
+                "Content-Type": "application/json",
+                "X-CSRF-Token": window.STUDENT_CSRF_TOKEN || ""
+            },
+            body: JSON.stringify({
+                record: {
+                    courses: courses,
+                    gradingSystem: gradingSystemSelect
+                        ? gradingSystemSelect.value
+                        : "5"
+                }
+            })
+        });
+
+        if (!response.ok) {
+            console.error("GPA record could not be saved.");
+        }
+
+    } catch (error) {
+        console.error("Student GPA saving failed:", error);
+    }
+}
+
 const gradingSystemSelect = document.getElementById("grading-system");
 if (gradingSystemSelect) {
     const savedGradingSystem = localStorage.getItem("gradingSystem") || "5";
     gradingSystemSelect.value = ["4", "5"].includes(savedGradingSystem) ? savedGradingSystem : "5";
     gradingSystemSelect.addEventListener("change", () => {
         localStorage.setItem("gradingSystem", gradingSystemSelect.value);
+        saveStudentGpaRecord();
     });
 }
 
@@ -85,6 +168,7 @@ if (addCourseBtn) {
         }
 
         localStorage.setItem("gpaCourses", JSON.stringify(courses));
+        saveStudentGpaRecord();
 
         // Refresh layout view matrix
         renderCourses();
@@ -154,6 +238,7 @@ function removeCourse(buttonElement) {
     if (index !== -1) {
         courses.splice(index, 1);
         localStorage.setItem("gpaCourses", JSON.stringify(courses));
+        saveStudentGpaRecord();
         
         // Reset inputs if the user deletes the active element currently being edited
         if (editingIndex === index) {
@@ -193,6 +278,7 @@ if (courseTableList) {
 }
 
 // Load and populate existing datasets from user cache memory immediately on DOM loading sequences
-window.addEventListener("DOMContentLoaded", function() {
+window.addEventListener("DOMContentLoaded",async  function() {
+    await loadStudentGpaRecord();
     renderCourses();
 });

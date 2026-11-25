@@ -64,5 +64,39 @@
       </main>
     </div>
     <script src="{{ url_for('static', filename='admin.js') }}"></script>
-  </body>
+  </body>@admin_bp.route("/newsletter/subscribe", methods=["POST"])
+def subscribe_newsletter():
+    email = request.form.get("email", "").strip().lower()
+
+    if not email or not re.fullmatch(
+        r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}",
+        email
+    ):
+        flash("Please enter a valid email address.", "error")
+        return redirect(url_for("home"))
+
+    db = get_db()
+
+    existing = db.execute(
+        "SELECT id, status FROM newsletter_subscribers WHERE email = ?",
+        (email,)
+    ).fetchone()
+
+    if existing:
+        flash("This email is already subscribed.", "info")
+        return redirect(url_for("home"))
+
+    token = secrets.token_urlsafe(32)
+
+    db.execute(
+        """
+        INSERT INTO newsletter_subscribers (email, unsubscribe_token)
+        VALUES (?, ?)
+        """,
+        (email, token)
+    )
+    db.commit()
+
+    flash("You're subscribed to the CGPA Hub newsletter!", "success")
+    return redirect(url_for("home"))
 </html>

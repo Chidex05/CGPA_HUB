@@ -1,13 +1,28 @@
+#Copyright (c) 2026 CGPA Hub. All right reserved.
 import logging
 import os
 import re
 import sys
 import uuid
 from datetime import date, timedelta
+from flask import redirect, session
 
-from flask import Flask, abort, has_request_context, jsonify, render_template, request, send_from_directory, url_for
+from flask import (
+    Flask,
+    abort,
+    has_request_context,
+    jsonify,
+    render_template,
+    request,
+    send_from_directory,
+    url_for,
+    redirect,
+    session,
+    flash,
+)
 from werkzeug.exceptions import HTTPException
 from academic_engine import calculate_academic_record
+from student_routes import student_bp
 from admin import (
     POST_CATEGORY_OPTIONS,
     admin_bp,
@@ -18,6 +33,7 @@ from admin import (
     get_db,
     initialize_database,
 )
+from student_routes import student_bp
 from database import DatabaseError
 
 logger = logging.getLogger("cgpa_hub")
@@ -99,6 +115,7 @@ def _log_sanitized_exception(error, context):
 
 
 app = Flask(__name__)
+app.config["PUBLIC_BASE_URL"]= os.environ.get("PUBLIC_BASE_URL", "").rstrip("/")
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=30)
@@ -106,6 +123,7 @@ app.config["SESSION_COOKIE_SECURE"] = (
 os.environ.get("SESSION_COOKIE_SECURE", "false").lower() == "true"
 )
 app.register_blueprint(admin_bp)
+app.register_blueprint(student_bp)
 app.teardown_appcontext(close_db)
 
 
@@ -191,13 +209,20 @@ def gpa():
 
 @app.route('/dashboard')
 def dashboard():
+    if not session.get("student_id"):
+        flash("Please log in to access your dashboard" ,"error")
+        return redirect(url_for("student.login"))
     return render_template('dashboard.html')
+
 
 @app.route('/grade_predictor')
 @app.route('/grade-predictor')
 def grade_predictor():
     return render_template('grade_predictor.html')
-
+@app.context_processor
+def inject_student_token():
+    from student_routes import get_student_csrf_token
+    return {"student_csrf_token": get_student_csrf_token}
 
 @app.context_processor
 def inject_current_year():

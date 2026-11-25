@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-     <script async
+     <!-- <script async
      src="https://www.googletagmanager.com/gtag.js?id=G-HCTF51D4DP"></script>
      <script> window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
         gtag('config', 'G-HCTF51D4DP');
-        </script>
+        </script> -->
 
 
     <meta charset="UTF-8">
@@ -21,9 +21,9 @@
     
     <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
 </head>
-
+ 
 <body class="background">
-      <div id="nav-bar">
+    <div id="nav-bar">
       <div class="logo">
          <h2>
         <i class="fa-solid fa-graduation-cap"></i>CGPA <span>Hub</span></h2>
@@ -43,10 +43,19 @@
         <a href="{{ url_for('grade_predictor') }}"> <i class="fa-solid fa-chart-column"></i>Grade Predictor</a>
 
         <a href="{{ url_for('blog') }}"> <i class="fa-solid fa-newspaper"></i>Articles</a>
+        
+
+        <form action="{{ url_for('student.logout') }}" method="POST" class="logout-form">
+         <input type="hidden" name="csrf_token" value="{{ student_csrf_token() }}">
+         <button type="submit" class="logout-btn">
+         <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </button>
+       </form>
        
       </nav>
+      
          <i class="fa-solid fa-moon moon"></i>
-         </div>
+      </div>
 
 
 
@@ -133,16 +142,11 @@
   {% include "footer_verse.html" %}
   <p>@ 2026 CGPA Hub. Your Academic Success, Our Priority. </p>
  </footer>
-    
 
 
-    
 
- 
-<script src="{{url_for('static', filename='dashboard.js')}}"></script>
-    
-   
-<!-- <script src="{{url_for('static', filename='main.js')}}"></script> -->
+
+ <script src="/static/dashboard.js"></script>
 
 </body>
 </html>
