@@ -101,9 +101,8 @@ def register():
             student_id,
             current_app.config["SECRET_KEY"]
         )
-        print("DEBUG VERIFICATION CODE:", code)
 
-        send_verification_email(email, code, allow_dev_mode= True)
+        send_verification_email(email, code)
 
     except Exception:
         current_app.logger.exception(
@@ -232,8 +231,7 @@ def login():
 
             send_verification_email(
                 student["email"],
-                code,
-                allow_dev_mode=True
+                code
             )
 
             flash("A new verification code has been sent to your email.", "success")
